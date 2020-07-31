@@ -22,9 +22,9 @@
 */
 
 const functions = require('firebase-functions');
+require("firebase-functions/lib/logger/compat"); // This is to properly structure console output with Node v10 in Firebase
 const admin = require('firebase-admin');
 const videoIntel = require('@google-cloud/video-intelligence');
-require('dotenv').config()
 
 admin.initializeApp();
 
@@ -40,9 +40,14 @@ async function runVideoAnalyzer(bucketObject) {
 	let filePath = bucketObject.name;
 	let jsonPath = bucketObject.name.split('.')[0] + '.json'
 
+	console.log(
+		"Input URI: ", `gs://${bucketObject.bucket}/${bucketObject.name}\n`,
+		"Output URI: ", `gs://${functions.config().memoree.json_bucket}/${jsonPath}`
+	)
+
 	let request = {
 		inputUri: `gs://${bucketObject.bucket}/${bucketObject.name}`,
-		outputUri: `gs://${process.env.VIDEO_JSON_BUCKET}/${jsonPath}`,
+		outputUri: `gs://${functions.config().memoree.json_bucket}/${jsonPath}`,
 		features: [
 			"LABEL_DETECTION",
 			"SHOT_CHANGE_DETECTION",
@@ -79,16 +84,6 @@ async function runVideoAnalyzer(bucketObject) {
 	const [operation] = await videoClient.annotateVideo(request);
 	console.log("Video annotation initatied: ", operation)
 
-	admin
-		.firestore()
-		.collection('videos')
-		.doc(bucketObject.name.split('.')[0])
-		.set({
-			status: 'processing',
-			filePath: bucketObject.name,
-			operation: operation.name,
-			operationInfo: operation,
-		}, {merge: true})
 }
 
 
@@ -101,7 +96,7 @@ exports.helloWorld = functions.https.onRequest((request, response) => {
 
 exports.analyzeVideo = functions
 	.storage
-	.bucket(process.env.VIDEO_BUCKET)
+	.bucket(functions.config().memoree.video_bucket)
 	.object()
 	.onFinalize(async (object) => {
 		await Promise.all([runVideoAnalyzer(object)]);
