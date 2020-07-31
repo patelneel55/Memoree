@@ -74,14 +74,14 @@ async function runVideoAnalyzer(bucketObject) {
 		}
 	}
 
-	const videoClient = videoIntel.VideoIntelligenceServiceClient()
+	const videoClient = new videoIntel.VideoIntelligenceServiceClient()
 
 	const [operation] = await videoClient.annotateVideo(request);
 	console.log("Video annotation initatied: ", operation)
 
 	admin
 		.firestore()
-		.collection('video_archive/videos')
+		.collection('videos')
 		.doc(bucketObject.name.split('.')[0])
 		.set({
 			status: 'processing',
