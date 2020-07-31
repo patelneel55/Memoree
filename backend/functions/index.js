@@ -78,6 +78,17 @@ async function runVideoAnalyzer(bucketObject) {
 
 	const [operation] = await videoClient.annotateVideo(request);
 	console.log("Video annotation initatied: ", operation)
+
+	admin
+		.firestore()
+		.collection('video_archive/videos')
+		.doc(bucketObject.name.split('.')[0])
+		.set({
+			status: 'processing',
+			filePath: bucketObject.name,
+			operation: operation.name,
+			operationInfo: operation,
+		}, {merge: true})
 }
 
 
