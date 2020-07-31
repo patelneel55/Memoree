@@ -100,7 +100,8 @@ exports.helloWorld = functions.https.onRequest((request, response) => {
 });
 
 exports.analyzeVideo = functions
-	.storage(process.env.VIDEO_BUCKET)
+	.storage
+	.bucket(process.env.VIDEO_BUCKET)
 	.object()
 	.onFinalize(async (object) => {
 		await Promise.all([runVideoAnalyzer(object)]);
