@@ -79,7 +79,7 @@ async function runVideoAnalyzer(bucketObject) {
 		}
 	}
 
-	const videoClient = new videoIntel.VideoIntelligenceServiceClient()
+	const videoClient = new videoIntel.v1p3beta1.VideoIntelligenceServiceClient()
 
 	const [operation] = await videoClient.annotateVideo(request);
 	console.log("Video annotation initatied: ", operation)
