@@ -15,7 +15,8 @@
   "dependencies": {
     "@google-cloud/video-intelligence": "^3.0.1",
     "firebase-admin": "^8.13.0",
-    "firebase-functions": "^3.8.0"
+    "firebase-functions": "^3.8.0",
+    "js-search": "^2.0.0"
   },
   "devDependencies": {
     "eslint": "^5.12.0",
