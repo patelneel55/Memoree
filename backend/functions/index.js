@@ -68,9 +68,6 @@ async function runVideoAnalyzer(bucketObject) {
 				includeBoundingBoxes: true,
 				includeAttributes: true,
 			},
-			textDetectionConfig: {
-				languageHints: ["en-US", "hi-IN", "gu-IN", "ta-IN"]
-			},
 			personDetectionConfig: {
 				includeBoundingBoxes: true,
 				includePoseLandmarks: true,
