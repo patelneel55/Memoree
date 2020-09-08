@@ -25,6 +25,9 @@ const functions = require('firebase-functions');
 require("firebase-functions/lib/logger/compat"); // This is to properly structure console output with Node v10 in Firebase
 const admin = require('firebase-admin');
 const videoIntel = require('@google-cloud/video-intelligence');
+const fs = require('fs');
+
+const utils = require('./utils.js');
 
 admin.initializeApp();
 
@@ -83,6 +86,40 @@ async function runVideoAnalyzer(bucketObject) {
 
 }
 
+async function addSearchRecords(bucketObject) {
+	const tempFilePath = path.join(os.tmpdir(), bucketObject.name.split('.')[0] + '.json');
+
+	await admin
+		.storage()
+		.bucket(bucketObject.bucket)
+		.file(bucketObject.name)
+		.download({destination: tempFilePath})
+
+	const json = JSON.parse(fs.readFileSync(tempFilePath));
+
+	const parseFunc = [
+		utils.segment_label_annotations,
+		utils.shot_label_annotations,
+		utils.object_annotations,
+		utils.logo_annotations,
+		utils.text_annotations,
+		utils.face_annotations,
+		utils.speech_annotations
+	]
+
+	let recordList = []
+	parseFunc.forEach((func) => {
+		recordList = recordList.concat(func(json.annotation_results))
+	})
+
+	algolia.save(
+		recordList,
+		functions.config().memoree.algolia_appid,
+		functions.config().memoree.algolia_admin_key,
+		functions.config().memoree.algolia_index
+	);
+}
+
 
 // The following functions are triggered when a new entity is added or
 // modified in Google Cloud Storage
@@ -95,7 +132,14 @@ exports.analyzeVideo = functions
 	.storage
 	.bucket(functions.config().memoree.video_bucket)
 	.object()
-	.onFinalize(async (object) => {
-		await Promise.all([runVideoAnalyzer(object)]);
+	.onFinalize((object) => {
+		await runVideoAnalyzer(object);
+	})
 
+exports.processJson = functions
+	.storage
+	.bucket(functions.config().memoree.video_json_archive)
+	.object()
+	.onFinalize((object) => {
+		await addSearchRecords(object)
 	})
