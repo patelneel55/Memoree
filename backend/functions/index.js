@@ -118,6 +118,7 @@ async function addSearchRecords(bucketObject) {
 		functions.config().memoree.algolia_admin_key,
 		functions.config().memoree.algolia_index
 	);
+	console.log("Video records added to Algolia: ", bucketObject.name);
 }
 
 
