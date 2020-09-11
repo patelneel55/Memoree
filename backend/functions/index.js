@@ -133,14 +133,14 @@ exports.analyzeVideo = functions
 	.storage
 	.bucket(functions.config().memoree.video_bucket)
 	.object()
-	.onFinalize((object) => {
+	.onFinalize(async (object) => {
 		await runVideoAnalyzer(object);
 	})
 
 exports.processJson = functions
 	.storage
-	.bucket(functions.config().memoree.video_json_archive)
+	.bucket(functions.config().memoree.json_bucket)
 	.object()
-	.onFinalize((object) => {
+	.onFinalize(async (object) => {
 		await addSearchRecords(object)
 	})
