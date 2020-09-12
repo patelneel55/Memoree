@@ -126,14 +126,14 @@ exports.text_annotations = (annotation_results) => {
     })
         .flatMap((annotation) => {
             return annotation.text_annotations.flatMap((tt) => {
-                return annotation.segments.flatMap((segment) => {
+                return tt.segments.flatMap((segment) => {
                     return {
                         file_name: annotation.input_uri,
                         subheader: "text_annotations",
                         text: tt.text,
                         confidence: segment.confidence,
-                        start_time: segment.end_time_offset.seconds * 1000 + (segment.end_time_offset.nanos / 1000000) - 5000,
-                        end_time: segment.end_time_offset.seconds * 1000 + (segment.end_time_offset.nanos / 1000000),
+                        start_time: segment.segment.end_time_offset.seconds * 1000 + (segment.segment.end_time_offset.nanos / 1000000) - 5000,
+                        end_time: segment.segment.end_time_offset.seconds * 1000 + (segment.segment.end_time_offset.nanos / 1000000),
                     };
                 });
             });
