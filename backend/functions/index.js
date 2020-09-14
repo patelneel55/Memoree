@@ -26,8 +26,11 @@ require("firebase-functions/lib/logger/compat"); // This is to properly structur
 const admin = require('firebase-admin');
 const videoIntel = require('@google-cloud/video-intelligence');
 const fs = require('fs');
+const path = require('path');
+const os = require('os');
 
 const utils = require('./utils.js');
+const algolia = require('./algolia.js');
 
 admin.initializeApp();
 
@@ -89,6 +92,7 @@ async function runVideoAnalyzer(bucketObject) {
 async function addSearchRecords(bucketObject) {
 	const tempFilePath = path.join(os.tmpdir(), bucketObject.name.split('.')[0] + '.json');
 
+	fs.mkdirSync(path.dirname(tempFilePath), {recursive: true})
 	await admin
 		.storage()
 		.bucket(bucketObject.bucket)

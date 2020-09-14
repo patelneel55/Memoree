@@ -22,7 +22,7 @@
 */
 
 const algoliasearch = require('algoliasearch');
-const encode = require('hashCode').hashCode;
+const encode = require('hashcode').hashCode;
 
 exports.save = (records, appId, apiKey, targetIndex) => {
     function _generateObjectID(obj) {

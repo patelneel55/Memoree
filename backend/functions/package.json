@@ -10,12 +10,14 @@
     "logs": "firebase functions:log"
   },
   "engines": {
-    "node": "10"
+    "node": "12"
   },
   "dependencies": {
     "@google-cloud/video-intelligence": "^3.0.1",
+    "algoliasearch": "^4.4.0",
     "firebase-admin": "^8.13.0",
     "firebase-functions": "^3.8.0",
+    "hashcode": "^1.0.3",
     "js-search": "^2.0.0"
   },
   "devDependencies": {
