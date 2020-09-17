@@ -38,6 +38,7 @@ with open(metadata_file) as json_file:
     # Reset metadata values once day/month changes
     if uploaded_json_data["last_update"] != datetime.date.today().isoformat():
         uploaded_json_data["total_size"] = 0
+        uploaded_json_data["last_update"] = datetime.date.today().isoformat()
     elif uploaded_json_data["total_size"] >= gb_limit * 1024 * 1024 * 1024:
         print()
         print("Daily bandwith quota exceeded.")
@@ -45,6 +46,7 @@ with open(metadata_file) as json_file:
     
     if uploaded_json_data["last_month"] != datetime.datetime.today().month:
         uploaded_json_data["total_duration"] = 0
+        uploaded_json_data["last_month"] = datetime.datetime.today().month
     elif uploaded_json_data["total_duration"] >= duration_limit * 60:
         print()
         print("Monthly duration quota exceeded.")
