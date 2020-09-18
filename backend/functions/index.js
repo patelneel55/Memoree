@@ -92,6 +92,7 @@ async function runVideoAnalyzer(bucketObject) {
 async function addSearchRecords(bucketObject) {
 	const tempFilePath = path.join(os.tmpdir(), bucketObject.name.split('.')[0] + '.json');
 
+	console.log("Adding video records to Algolia: ", bucketObject.name)
 	fs.mkdirSync(path.dirname(tempFilePath), {recursive: true})
 	await admin
 		.storage()
@@ -122,7 +123,6 @@ async function addSearchRecords(bucketObject) {
 		functions.config().memoree.algolia_admin_key,
 		functions.config().memoree.algolia_index
 	);
-	console.log("Video records added to Algolia: ", bucketObject.name);
 }
 
 
