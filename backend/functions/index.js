@@ -129,11 +129,17 @@ async function addSearchRecords(bucketObject) {
 // The following functions are triggered when a new entity is added or
 // modified in Google Cloud Storage
 
+const runtimeOpts = {
+	timeoutSeconds: 60,
+	memory: '2GB'
+}
+
 exports.helloWorld = functions.https.onRequest((request, response) => {
 	response.send("Hello from Firebase!");
 });
 
 exports.analyzeVideo = functions
+	.runWith(runtimeOpts)
 	.storage
 	.bucket(functions.config().memoree.video_bucket)
 	.object()
@@ -142,6 +148,7 @@ exports.analyzeVideo = functions
 	})
 
 exports.processJson = functions
+	.runWith(runtimeOpts)
 	.storage
 	.bucket(functions.config().memoree.json_bucket)
 	.object()
