@@ -114,7 +114,7 @@ exports.save = (records, host, port, apiKey, targetIndex) => {
     // Import records to typesense server, create a new collection if applicable
     typesenseClient.collections(targetIndex).documents().import(records, {action: 'upsert'})
     .catch(err => {
-        // Create new collection if 404 error was returned
+        // Create new index if 404 error was returned
         if(err.httpStatus == 404)
         {
             typesenseClient.collections().create(get_search_server_schema(targetIndex))
@@ -123,6 +123,16 @@ exports.save = (records, host, port, apiKey, targetIndex) => {
             });
         }
         else
-            console.log(err);
+            console.error(err);
+    })
+    .then(res => {
+        errors = []
+        for(let i = 0;i < res.length;i++)
+        {
+            if(!res[i].success)
+                errors.push(i);
+        }
+        if(errors.length != 0)
+            console.log("Errors: ", errors);
     });
 }

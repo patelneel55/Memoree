@@ -31,6 +31,7 @@ const os = require('os');
 
 const utils = require('./utils.js');
 const algolia = require('./algolia.js');
+const typesense = require('./typesense.js');
 
 admin.initializeApp();
 
@@ -92,7 +93,7 @@ async function runVideoAnalyzer(bucketObject) {
 async function addSearchRecords(bucketObject) {
 	const tempFilePath = path.join(os.tmpdir(), bucketObject.name.split('.')[0] + '.json');
 
-	console.log("Adding video records to Algolia: ", bucketObject.name)
+	console.log("Adding video records to TypeSense: ", bucketObject.name)
 	fs.mkdirSync(path.dirname(tempFilePath), {recursive: true})
 	await admin
 		.storage()
@@ -117,12 +118,13 @@ async function addSearchRecords(bucketObject) {
 		recordList = recordList.concat(func(json.annotation_results))
 	})
 
-	algolia.save(
+	typesense.save(
 		recordList,
-		functions.config().memoree.algolia_appid,
-		functions.config().memoree.algolia_admin_key,
-		functions.config().memoree.algolia_index
-	);
+		functions.config().memoree.search_host,
+		functions.config().memoree.search_port,
+		functions.config().memoree.search_apikey,
+		functions.config().memoree.search_index
+	)
 }
 
 
