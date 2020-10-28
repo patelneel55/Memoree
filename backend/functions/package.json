@@ -2,7 +2,7 @@
   "name": "functions",
   "description": "Cloud Functions for Firebase",
   "scripts": {
-    "lint": "eslint .",
+    "lint": "echo 1",
     "serve": "firebase emulators:start --only functions",
     "shell": "firebase functions:shell",
     "start": "npm run shell",
@@ -15,10 +15,13 @@
   "dependencies": {
     "@google-cloud/video-intelligence": "^3.0.1",
     "algoliasearch": "^4.4.0",
+    "fetch": "^1.1.0",
     "firebase-admin": "^8.13.0",
     "firebase-functions": "^3.8.0",
     "hashcode": "^1.0.3",
-    "js-search": "^2.0.0"
+    "js-search": "^2.0.0",
+    "node-fetch": "^2.6.1",
+    "typesense": "^0.8.0"
   },
   "devDependencies": {
     "eslint": "^5.12.0",

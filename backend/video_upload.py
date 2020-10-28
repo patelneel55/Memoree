@@ -18,7 +18,7 @@ source_path = sys.argv[1]
 gcloud_bucket = sys.argv[2]
 
 # Constants
-gb_limit = 3 # Daily bandwith limit in GB 
+gb_limit = 5 # Daily bandwith limit in GB
 duration_limit = 950 # Monthy video duration limit in mins
 metadata_file = "./uploaded_files.json"
 
