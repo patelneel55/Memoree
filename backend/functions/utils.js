@@ -179,15 +179,12 @@ exports.speech_annotations = (annotation_results) => {
                 // Streamline the json so we have less to store
                 return {
                     file_name: annotation.input_uri,
+                    subheader: "speech_transcription",
                     transcript: alternative.transcript,
                     confidence: alternative.confidence,
                     start_time: alternative.words[0].start_time,
                     words: alternative.words.map((word) => {
-                        return {
-                            start_time: word.start_time.seconds || 0,
-                            end_time: word.end_time.seconds,
-                            word: word.word,
-                        };
+                        return word.word;
                     }),
                 };
             });
