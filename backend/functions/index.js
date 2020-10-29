@@ -91,7 +91,7 @@ async function runVideoAnalyzer(bucketObject) {
 }
 
 async function addSearchRecords(bucketObject) {
-	const tempFilePath = path.join(os.tmpdir(), bucketObject.name.split('.')[0] + '.json');
+	const tempFilePath = path.join(os.tmpdir(), bucketObject.name.split(/(?:\.([^.]+))?$/)[0] + '_' + bucketObject.name.split(/(?:\.([^.]+))?$/)[1] + '.json');
 
 	console.log("Adding video records to TypeSense: ", bucketObject.name)
 	fs.mkdirSync(path.dirname(tempFilePath), {recursive: true})
