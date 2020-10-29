@@ -113,18 +113,16 @@ async function addSearchRecords(bucketObject) {
 		utils.speech_annotations
 	]
 
-	let recordList = []
+	// Upload parsed data to search database using helper functions
 	parseFunc.forEach((func) => {
-		recordList = recordList.concat(func(json.annotation_results))
+		typesense.save(
+			func(json.annotation_results),
+			functions.config().memoree.search_host,
+			functions.config().memoree.search_port,
+			functions.config().memoree.search_apikey,
+			functions.config().memoree.search_index
+		)
 	})
-
-	typesense.save(
-		recordList,
-		functions.config().memoree.search_host,
-		functions.config().memoree.search_port,
-		functions.config().memoree.search_apikey,
-		functions.config().memoree.search_index
-	)
 }
 
 

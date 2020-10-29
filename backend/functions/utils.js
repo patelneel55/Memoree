@@ -148,6 +148,8 @@ exports.face_annotations = (annotation_results) => {
             return annotation.face_detection_annotations.flatMap((face) => {
 
                 return face.tracks.flatMap((track) => {
+                    if(!track.attributes)
+                        return []
                     return track.attributes.flatMap((attr) => {
                         return {
                             file_name: annotation.input_uri,
