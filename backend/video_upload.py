@@ -12,16 +12,25 @@ import sys
 import os
 import json
 import datetime
+import argparse
 
-# Program parameters
-source_path = sys.argv[1]
-gcloud_bucket = sys.argv[2]
+# Program argument parser
+arg_parser = argparse.ArgumentParser(description='Bulk upload all video files under the provided path to GCloud buckets using gsutil.')
+arg_parser.add_argument("input_path", help="Input path of all the video files.")
+arg_parser.add_argument("gcp_bucket_path", help="GCloud URI of the target bucket.")
+arg_parser.add_argument("--gb", "-d", help="Daily upload bandwidth limit in GB. Default: 5GB")
+arg_parser.add_argument("--duration", "-m", help="Monthly duration limit of videos in min. Default: 950min")
+
+args = arg_parser.parse_args();
+
+# Path parameters
+source_path = args.input_path
+gcloud_bucket = args.gcp_bucket_path
 
 # Constants
-gb_limit = 5 # Daily bandwith limit in GB
-duration_limit = 950 # Monthy video duration limit in mins
+gb_limit = args.gb or 5 # Daily bandwith limit in GB
+duration_limit = args.duration or 950 # Monthy video duration limit in mins
 metadata_file = "./uploaded_files.json"
-
 
 with open(metadata_file) as json_file:
     try:
