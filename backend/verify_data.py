@@ -41,15 +41,15 @@ if len(local_video_list) != len(set(local_video_list)):
     print("# of videos in GCloud:", len(gs_video_list))
     print()
 
-if len(set(gs_video_list)) != len(set(local_video_list)):
-    gs_video_cut = [os.path.relpath(video, gcloud_video_bucket) for video in set(gs_video_list)]
-    local_video_cut = [os.path.relpath(video, prefix_path) for video in set(local_video_list)]
+gs_video_cut = [os.path.relpath(video, gcloud_video_bucket) for video in set(gs_video_list)]
+local_video_cut = [os.path.relpath(video, prefix_path) for video in set(local_video_list)]
 
+if len(set(gs_video_list)) != len(set(local_video_list)):
     print("Files in GCloud but not in metadata file:")
     print("\n".join(list(set(gs_video_cut) - set(local_video_cut))))
     print()
 
-    print("Files in metadata file but not in metadata file:")
+    print("Files in metadata file but not in GCloud video bucket:")
     print("\n".join(list(set(local_video_cut) - set(gs_video_cut))))
     print()
 
@@ -66,12 +66,11 @@ print()
 if len(gs_video_list) != len(gs_json_list):
     gs_json_cut = [os.path.splitext(os.path.relpath(video, gcloud_json_bucket))[0] for video in set(gs_json_list)]
     gs_video_cut_ext = [os.path.splitext(video)[0] for video in gs_video_cut]
-    print([entry for entry, count in Counter(gs_video_cut).items() if count > 1])
     
     print("Files in the video bucket but not in json bucket:")
-    print("\n".join(list(set(gs_video_cut) - set(gs_json_cut))))
+    print("\n".join(list(set(gs_video_cut_ext) - set(gs_json_cut))))
     print()
 
     print("Files in the json bucket but not in video bucket:")
-    print("\n".join(list(set(gs_json_cut) - set(gs_video_cut))))
+    print("\n".join(list(set(gs_json_cut) - set(gs_video_cut_ext))))
     print()

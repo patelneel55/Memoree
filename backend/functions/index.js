@@ -45,7 +45,7 @@ admin.initializeApp();
 async function runVideoAnalyzer(bucketObject) {
 
 	let filePath = bucketObject.name;
-	let jsonPath = bucketObject.name.split('.')[0] + '.json'
+	let jsonPath = bucketObject.name.split(/(?:\.([^.]+))?$/)[0] + '_' + bucketObject.name.split(/(?:\.([^.]+))?$/)[1] + '.json'
 
 	console.log(
 		"Input URI: ", `gs://${bucketObject.bucket}/${bucketObject.name}\n`,
