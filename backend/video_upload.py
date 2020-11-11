@@ -18,8 +18,8 @@ import argparse
 arg_parser = argparse.ArgumentParser(description='Bulk upload all video files under the provided path to GCloud buckets using gsutil.')
 arg_parser.add_argument("input_path", help="Input path of all the video files.")
 arg_parser.add_argument("gcp_bucket_path", help="GCloud URI of the target bucket.")
-arg_parser.add_argument("--gb", "-d", help="Daily upload bandwidth limit in GB. Default: 5GB")
-arg_parser.add_argument("--duration", "-m", help="Monthly duration limit of videos in min. Default: 950min")
+arg_parser.add_argument("--gb", "-d", help="Daily upload bandwidth limit in GB. Default: 5GB", default=5)
+arg_parser.add_argument("--duration", "-m", help="Monthly duration limit of videos in min. Default: 950min", default=950)
 
 args = arg_parser.parse_args();
 
@@ -28,8 +28,8 @@ source_path = args.input_path
 gcloud_bucket = args.gcp_bucket_path
 
 # Constants
-gb_limit = args.gb or 5 # Daily bandwith limit in GB
-duration_limit = args.duration or 950 # Monthy video duration limit in mins
+gb_limit = float(args.gb) # Daily bandwith limit in GB
+duration_limit = float(args.duration) # Monthy video duration limit in mins
 metadata_file = "./uploaded_files.json"
 
 with open(metadata_file) as json_file:
