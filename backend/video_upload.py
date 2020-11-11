@@ -62,7 +62,7 @@ with open(metadata_file) as json_file:
         sys.exit(1)
     
 # Recursively get all video files from the provided source path
-file_paths = find(source_path, "-type", "f", "-regex", ".*\.\(mov\|mp4\|avi\|wmv\|mpeg\|vob\)", _iter=True)
+file_paths = find(source_path, "-type", "f", "-iregex", ".*\.\(mov\|mp4\|avi\|wmv\|mpeg\|vob\)", _iter=True)
 
 file_counter = 0
 with open(metadata_file, 'a+') as json_file:
