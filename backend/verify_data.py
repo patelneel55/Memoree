@@ -4,7 +4,8 @@
 #   Verifies data integrity between local files and the GCloud  #
 #   buckets                                                     #
 #                                                               #
-#   Ex: python3 verify_data.py                                  #
+#   Ex: python3 verify_data.py -i <input_path> -m <metadata>    #
+#                           -v <video_bucket> -j <json_bucket>  #
 #################################################################
 
 from sh import gsutil, find
@@ -12,8 +13,6 @@ import os
 import json
 from collections import Counter
 import argparse
-
-
 
 # Program argument parser
 arg_parser = argparse.ArgumentParser(description='Bulk upload all video files under the provided path to GCloud buckets using gsutil.')
@@ -30,13 +29,6 @@ metadata_file = os.path.abspath(args.metadata)
 gcloud_video_bucket = args.video_bucket
 gcloud_json_bucket = args.json_bucket
 print()
-
-
-# metadata_file = "./uploaded_files.json"
-# gcloud_video_bucket = "gs://memoree_video_archive/"
-# gcloud_json_bucket = "gs://video_json_archive/"
-# prefix_path = "/mnt/e/Video Archive/"
-# print()
 
 with open(metadata_file) as json_file:
     metadata = json.load(json_file)
