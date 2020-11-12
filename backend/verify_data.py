@@ -20,7 +20,6 @@ arg_parser.add_argument("-i", "--input_path", help="Input path of all the video 
 arg_parser.add_argument("-m", "--metadata", help="Path to metadata file", required=True)
 arg_parser.add_argument("-v", "--video_bucket", help="GCloud URL to video bucket", required=True)
 arg_parser.add_argument("-j", "--json_bucket", help="GCloud URL to json bucket", required=True)
-
 args = arg_parser.parse_args()
 
 
