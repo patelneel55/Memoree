@@ -77,6 +77,10 @@ with open(metadata_file, 'a+') as json_file:
         file_duration = ffprobe("-show_entries", "format=duration", "-of", "default=noprint_wrappers=1:nokey=1", file)
         file_size = os.path.getsize(file)
 
+        # TODO: Fix this, what should we do if ffprobe fails
+        if "N/A" in str(file_duration):
+            continue
+
         if float(file_duration) + uploaded_json_data["total_duration"] > duration_limit * 60 or float(file_size) + uploaded_json_data["total_size"] > gb_limit * 1024 * 1024 * 1024:
             continue
 
