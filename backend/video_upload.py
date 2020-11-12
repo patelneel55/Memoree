@@ -61,6 +61,19 @@ with open(metadata_file) as json_file:
         print("Monthly duration quota exceeded.")
         sys.exit(1)
     
+    secs_rem = (duration_limit * 60) - uploaded_json_data["total_duration"]
+    bytes_rem = (gb_limit * 1024 * 1024 * 1024) - uploaded_json_data["total_size"] 
+
+    def sizeof_fmt(num, suffix='B'):
+        for unit in ['','Ki','Mi','Gi','Ti','Pi','Ei','Zi']:
+            if abs(num) < 1024.0:
+                return "%3.1f%s%s" % (num, unit, suffix)
+            num /= 1024.0
+        return "%.1f%s%s" % (num, 'Yi', suffix)
+    print("Daily data quota remaining:", sizeof_fmt(bytes_rem))
+    print("Monthly minute quota remaining:", str(datetime.timedelta(seconds=secs_rem)))
+    print()
+
 # Recursively get all video files from the provided source path
 file_paths = find(source_path, "-type", "f", "-iregex", ".*\.\(mov\|mp4\|avi\|wmv\|mpeg\|vob\)", _iter=True)
 
