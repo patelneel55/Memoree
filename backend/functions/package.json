@@ -1,0 +1,27 @@
+{
+  "name": "functions",
+  "description": "Cloud Functions for Firebase",
+  "scripts": {
+    "serve": "firebase emulators:start --only functions",
+    "shell": "firebase functions:shell",
+    "start": "npm run shell",
+    "deploy": "firebase deploy --only functions",
+    "logs": "firebase functions:log"
+  },
+  "engines": {
+    "node": "12"
+  },
+  "dependencies": {
+    "@babel/runtime": "^7.12.1",
+    "@google-cloud/video-intelligence": "^3.0.1",
+    "algoliasearch": "^4.4.0",
+    "firebase-admin": "^8.13.0",
+    "firebase-functions": "^3.8.0",
+    "hashcode": "^1.0.3",
+    "typesense": "^0.8.0"
+  },
+  "devDependencies": {
+    "firebase-functions-test": "^0.1.6"
+  },
+  "private": true
+}
