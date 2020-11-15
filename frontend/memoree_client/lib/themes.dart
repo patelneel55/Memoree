@@ -29,6 +29,7 @@ class AppTheme {
       color: _iconColor,
     ),
     textTheme: _lightTextTheme,
+    canvasColor: _lightPrimaryColor,
   );
   
   static final TextTheme _lightTextTheme = TextTheme(
