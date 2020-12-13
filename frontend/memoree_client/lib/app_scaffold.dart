@@ -38,11 +38,12 @@ class AppScaffold extends StatelessWidget {
             Flexible(
               flex: 5,
               child: Container(
+                constraints: BoxConstraints(minWidth: 100, maxWidth: 800),
                 padding: const EdgeInsets.all(100.0),
                 child: SearchWidget(),
               )
             ),
-          Expanded(flex: 2, child: Container())
+          // Expanded(flex: 2, child: Container())
         ],
       ),
       actions: <Widget>[
@@ -67,7 +68,7 @@ class AppScaffold extends StatelessWidget {
         ),
         if(!isMobile)
         Container(
-          padding: const EdgeInsets.only(right: 15.0, left: 10.0),
+          padding: const EdgeInsets.only(right: 10.0, left: 10.0),
           child: IconButton(
             icon: const Icon(Icons.settings_outlined),
             tooltip: ActionNames.settings,
@@ -75,6 +76,7 @@ class AppScaffold extends StatelessWidget {
             onPressed: () => {}
           ),
         ),
+        Container(padding: const EdgeInsets.all(5.0)),
       ]
     );
   }
