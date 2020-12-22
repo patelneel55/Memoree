@@ -100,39 +100,42 @@ exports.save = (records, host, port, apiKey, targetIndex) => {
         }
     })
 
-    // Create search server client
-    const typesenseClient = new TypeSense.Client({
-        nodes: [{
-            host: host,
-            port: port,
-            protocol: "http"
-        }],
-        apiKey: apiKey,
-        'connectionTimeoutSeconds': 2
-    });
+    if(records.length > 0)
+    {
+        // Create search server client
+        const typesenseClient = new TypeSense.Client({
+            nodes: [{
+                host: host,
+                port: port,
+                protocol: "http"
+            }],
+            apiKey: apiKey,
+            'connectionTimeoutSeconds': 2
+        });
 
-    // Import records to typesense server, create a new collection if applicable
-    typesenseClient.collections(targetIndex).documents().import(records, {action: 'upsert'})
-    .catch(err => {
-        // Create new index if 404 error was returned
-        if(err.httpStatus == 404)
-        {
-            typesenseClient.collections().create(get_search_server_schema(targetIndex))
-            .then(res => {
-                typesenseClient.collections(targetIndex).documents().import(records, {action: 'upsert'});
-            });
-        }
-        else
-            console.error(err);
-    })
-    .then(res => {
-        errors = []
-        for(let i = 0;i < res.length;i++)
-        {
-            if(!res[i].success)
-                errors.push(i);
-        }
-        if(errors.length != 0)
-            console.log("Errors: ", errors);
-    });
+        // Import records to typesense server, create a new collection if applicable
+        typesenseClient.collections(targetIndex).documents().import(records, {action: 'upsert'})
+        .catch(err => {
+            // Create new index if 404 error was returned
+            if(err.httpStatus == 404)
+            {
+                typesenseClient.collections().create(get_search_server_schema(targetIndex))
+                .then(res => {
+                    typesenseClient.collections(targetIndex).documents().import(records, {action: 'upsert'});
+                });
+            }
+            else
+                console.error(err);
+        })
+        .then(res => {
+            errors = []
+            for(let i = 0;i < res.length;i++)
+            {
+                if(!res[i].success)
+                    errors.push(i);
+            }
+            if(errors.length != 0)
+                console.log("Errors: ", errors);
+        });
+    }
 }
