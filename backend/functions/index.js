@@ -125,6 +125,40 @@ async function addSearchRecords(bucketObject) {
 	})
 }
 
+async function makeSearchRequest(queryParams)
+{
+	let tailoredResults = [];
+	let request_per_page = queryParams.per_page * queryParams.page;
+	queryParams.page = 1;
+
+	while(tailoredResults.length < request_per_page)
+	{
+		let searchResult = await typesense.search(
+			queryParams,
+			functions.config().memoree.search_host,
+			functions.config().memoree.search_port,
+			functions.config().memoree.search_apikey,
+			functions.config().memoree.search_index
+		);
+		if(searchResult.hits.length == 0)
+			break;
+
+		searchResult.hits.map(obj => {
+			return {
+				"file_name": obj.document.file_name,
+				"confidence": obj.document.confidence
+			}
+		}).forEach((item) => {
+			if(tailoredResults.findIndex((item1) => item1.file_name == item.file_name) == -1)
+				tailoredResults.push(item);
+		})
+
+		queryParams.page++;
+	}
+
+	return tailoredResults;
+}
+
 
 // The following functions are triggered when a new entity is added or
 // modified in Google Cloud Storage
@@ -155,3 +189,15 @@ exports.processJson = functions
 	.onFinalize(async (object) => {
 		await addSearchRecords(object)
 	})
+
+exports.search = functions.runWith(runtimeOpts).https.onRequest(async (req, res) => {
+	let queryParams = {
+		"query": req.query.q,
+		"sortType": req.query.sort || "relevant",
+		"page": req.query.page || 1,
+		"per_page": req.query.per_page || 50,
+	}
+	let resData = await makeSearchRequest(queryParams);
+
+	res.send(resData);
+});

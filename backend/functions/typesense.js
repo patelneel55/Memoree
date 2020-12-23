@@ -139,3 +139,32 @@ exports.save = (records, host, port, apiKey, targetIndex) => {
         });
     }
 }
+
+exports.search = (queryParams, host, port, apiKey, targetIndex) => {
+    // Create search server client
+    const typesenseClient = new TypeSense.Client({
+        nodes: [{
+            host: host,
+            port: port,
+            protocol: "http"
+        }],
+        apiKey: apiKey,
+        'connectionTimeoutSeconds': 2
+    });
+
+    let searchParameters = {
+        'q': queryParams.query,
+        'page': queryParams.page,
+        'query_by': 'entity,keywords,text,transcript,file_name',
+        'per_page': 250,
+        'max_hits': 'all'
+    }
+    if(queryParams.sortType != "relevant")
+        searchParameters["sort_by"] = queryParams.sortType
+
+    return new Promise((resolve, reject) => {
+        typesenseClient.collections(targetIndex).documents().search(searchParameters)
+        .then(res => resolve(res))
+        .catch(err => reject(err));
+    });
+}
