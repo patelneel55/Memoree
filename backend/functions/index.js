@@ -144,9 +144,18 @@ async function makeSearchRequest(queryParams)
 			break;
 
 		searchResult.hits.map(obj => {
+			const file_blob = admin.storage().bucket(functions.config().memoree.video_bucket).file(obj.document.file_name);
+			const [url] = await file_blob.getSignedUrl({
+				version: 'v4',
+				action: 'read',
+				expires: Date.now() + (24 * 60 ** 2 * 1000)
+			});
+
 			return {
 				"file_name": obj.document.file_name,
-				"confidence": obj.document.confidence
+				"confidence": obj.document.confidence,
+				"videoURL": url,
+				"data": obj.document
 			}
 		}).forEach((item) => {
 			if(tailoredResults.findIndex((item1) => item1.file_name == item.file_name) == -1)
@@ -195,7 +204,7 @@ exports.search = functions.runWith(runtimeOpts).https.onRequest(async (req, res)
 		"query": req.query.q,
 		"sortType": req.query.sort || "relevant",
 		"page": req.query.page || 1,
-		"per_page": req.query.per_page || 50,
+		"per_page": req.query.per_page || 25,
 	}
 	let resData = await makeSearchRequest(queryParams);
 
