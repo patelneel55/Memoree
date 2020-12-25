@@ -143,24 +143,29 @@ async function makeSearchRequest(queryParams)
 		if(searchResult.hits.length == 0)
 			break;
 
-		searchResult.hits.map(obj => {
-			const file_blob = admin.storage().bucket(functions.config().memoree.video_bucket).file(obj.document.file_name);
-			const [url] = await file_blob.getSignedUrl({
-				version: 'v4',
-				action: 'read',
-				expires: Date.now() + (24 * 60 ** 2 * 1000)
-			});
-
+		let results = searchResult.hits.map(obj => {
 			return {
 				"file_name": obj.document.file_name,
 				"confidence": obj.document.confidence,
-				"videoURL": url,
 				"data": obj.document
 			}
-		}).forEach((item) => {
+		});
+
+		for (const item of results)
+		{
 			if(tailoredResults.findIndex((item1) => item1.file_name == item.file_name) == -1)
+			{
+				const file_blob = admin.storage().bucket(functions.config().memoree.video_bucket).file(item.file_name.replace(/^.+?[\/]/, ""));
+				const [url] = await file_blob.getSignedUrl({
+					version: 'v4',
+					action: 'read',
+					expires: Date.now() + (24 * 60 ** 2 * 1000)
+				});
+
+				item['videoURL'] = url;
 				tailoredResults.push(item);
-		})
+			}
+		}
 
 		queryParams.page++;
 	}
@@ -173,7 +178,7 @@ async function makeSearchRequest(queryParams)
 // modified in Google Cloud Storage
 
 const runtimeOpts = {
-	timeoutSeconds: 60,
+	timeoutSeconds: 90,
 	memory: '2GB'
 }
 
