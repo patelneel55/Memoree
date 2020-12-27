@@ -1,12 +1,16 @@
 import 'package:cloud_functions/cloud_functions.dart';
+import 'dart:io' as io;
+import 'package:path/path.dart' as path;
+import 'package:path_provider/path_provider.dart';
 
 class VideoData {
   final String filename;
   final String videoUrl;
   final DateTime timestamp;
   final List<dynamic> data;
+  final String thumbnailPath;
 
-  VideoData({this.filename, this.videoUrl, this.timestamp, this.data});
+  VideoData({this.filename, this.videoUrl, int timestamp, this.data}) : this.timestamp = timestamp != null ? DateTime.fromMillisecondsSinceEpoch(timestamp) : null, this.thumbnailPath = "";
 
   factory VideoData.fromJson(Map<String, dynamic> json) {
 
@@ -16,6 +20,34 @@ class VideoData {
       timestamp: json['timestamp'],
       data: json['document']
     );
+  }
+
+  Future<String> getThumbnail()
+  {
+    if(!this.thumbnailPath.isEmpty)
+      return this.thumbnailPath;
+    
+    final HttpsCallable funcCallable = FirebaseFunctions.instance.httpsCallable("generate_thumbnail");
+
+    try {
+      final HttpsCallableResult result = await funcCallable.call(<String, dynamic>{'video_url': this.videoUrl});
+      File thumb = File.fromRawPath(base64Decode(result.data));
+
+      String filePath = "";
+      do {
+        String fileName = String.fromCharCodes(List.generate(7, (index) => Random.secure().nextInt(33) + 89)) + ".png";
+        filePath = path.join((await getApplicationDocumentsDirectory()).path, fileName);
+      } while(File(filePath).exists());
+
+      thumb.copySync(filePath);
+      this.thumbnailPath = filePath;
+      return this.thumbnailPath;
+    }
+    catch(err)
+    {
+      print(err);
+      return null;
+    }
   }
 }
 
