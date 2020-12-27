@@ -163,6 +163,7 @@ async function makeSearchRequest(queryParams)
 				});
 
 				item['videoURL'] = url;
+				item['thumbnailData'] = await utils.generateThumbnail(url);
 				tailoredResults.push(item);
 			}
 		}
