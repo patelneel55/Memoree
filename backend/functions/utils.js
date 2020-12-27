@@ -21,13 +21,6 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-const os = require('os');
-const path = require('path');
-const fs = require('fs');
-
-const ffmpeg = require('fluent-ffmpeg');
-ffmpeg.setFfmpegPath(require('@ffmpeg-installer/ffmpeg').path);
-
 exports.segment_label_annotations = (annotation_results) => {
     return annotation_results.filter((annotation) => {
         return annotation.segment_label_annotations
@@ -197,28 +190,5 @@ exports.speech_annotations = (annotation_results) => {
                     }),
                 };
             });
-    });
-}
-
-exports.generateThumbnail = (videoURL) => {
-
-    let fileName = Math.random().toString(36).substring(7);
-    let filePath = path.join(os.tmpdir(), fileName);
-
-    return new Promise((resolve, reject) => {
-        ffmpeg(videoURL)
-        .screenshots({
-            folder: os.tmpdir(),
-            filename: fileName,
-            timemarks: [(Math.floor(Math.random() * 100) + 1) + "%"],
-        })
-        .on('end', () => {
-            let dataURL = fs.readFileSync(filePath + ".png", 'base64');
-            fs.unlinkSync(filePath + ".png");
-            resolve(dataURL);
-        })
-        .on('error', (err) => {
-            reject(err);
-        })
     });
 }

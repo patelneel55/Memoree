@@ -29,6 +29,9 @@ const fs = require('fs');
 const path = require('path');
 const os = require('os');
 
+const ffmpeg = require('fluent-ffmpeg');
+ffmpeg.setFfmpegPath(require('@ffmpeg-installer/ffmpeg').path);
+
 const utils = require('./utils.js');
 const algolia = require('./algolia.js');
 const typesense = require('./typesense.js');
@@ -163,7 +166,6 @@ async function makeSearchRequest(queryParams)
 				});
 
 				item['videoURL'] = url;
-				item['thumbnailData'] = await utils.generateThumbnail(url);
 				tailoredResults.push(item);
 			}
 		}
@@ -172,6 +174,31 @@ async function makeSearchRequest(queryParams)
 	}
 
 	return tailoredResults;
+}
+
+function generateThumbnail(videoURL) {
+
+    do {
+        var fileName = Math.random().toString(36).substring(7);
+        var filePath = path.join(os.tmpdir(), fileName);
+    } while(fs.existsSync(filePath + ".png"));
+
+    return new Promise((resolve, reject) => {
+        ffmpeg(videoURL)
+        .screenshots({
+            folder: os.tmpdir(),
+            filename: fileName,
+            timemarks: [(Math.floor(Math.random() * 15) + 1) + "%"],
+        })
+        .on('end', () => {
+            let dataURL = fs.readFileSync(filePath + ".png", 'base64');
+            fs.unlinkSync(filePath + ".png");
+            resolve(dataURL);
+        })
+        .on('error', (err) => {
+            reject(err);
+        })
+    });
 }
 
 
@@ -215,4 +242,12 @@ exports.search = functions.runWith(runtimeOpts).https.onRequest(async (req, res)
 	let resData = await makeSearchRequest(queryParams);
 
 	res.send(resData);
+});
+
+exports.generate_thumbnail = functions.runWith(runtimeOpts).https.onRequest(async (req, res) => {
+	let videoURL = req.query.video_url;
+
+	let imageData = await generateThumbnail(videoURL);
+
+	return res.send(imageData);
 });
