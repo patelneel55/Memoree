@@ -29,6 +29,9 @@ const fs = require('fs');
 const path = require('path');
 const os = require('os');
 
+const ffmpeg = require('fluent-ffmpeg');
+ffmpeg.setFfmpegPath(require('@ffmpeg-installer/ffmpeg').path);
+
 const utils = require('./utils.js');
 const algolia = require('./algolia.js');
 const typesense = require('./typesense.js');
@@ -125,12 +128,86 @@ async function addSearchRecords(bucketObject) {
 	})
 }
 
+async function makeSearchRequest(queryParams)
+{
+	let tailoredResults = [];
+	let request_per_page = queryParams.per_page * queryParams.page;
+	queryParams.page = 1;
+
+	while(tailoredResults.length < request_per_page)
+	{
+		let searchResult = await typesense.search(
+			queryParams,
+			functions.config().memoree.search_host,
+			functions.config().memoree.search_port,
+			functions.config().memoree.search_apikey,
+			functions.config().memoree.search_index
+		);
+		if(searchResult.hits.length == 0)
+			break;
+
+		let results = searchResult.hits.map(obj => {
+			return {
+				"file_name": obj.document.file_name,
+				"confidence": obj.document.confidence,
+				"data": obj.document
+			}
+		});
+
+		for (const item of results)
+		{
+			if(tailoredResults.findIndex((item1) => item1.file_name == item.file_name) == -1)
+			{
+				const file_blob = admin.storage().bucket(functions.config().memoree.video_bucket).file(item.file_name.replace(/^.+?[\/]/, ""));
+				const [url] = await file_blob.getSignedUrl({
+					version: 'v4',
+					action: 'read',
+					expires: Date.now() + (24 * 60 ** 2 * 1000)
+				});
+
+				item['videoURL'] = url;
+				tailoredResults.push(item);
+			}
+		}
+
+		queryParams.page++;
+	}
+
+	return tailoredResults;
+}
+
+function generateThumbnail(videoURL) {
+
+    do {
+        var fileName = Math.random().toString(36).substring(7);
+        var filePath = path.join(os.tmpdir(), fileName);
+    } while(fs.existsSync(filePath + ".png"));
+
+    return new Promise((resolve, reject) => {
+        ffmpeg(videoURL)
+        .screenshots({
+            folder: os.tmpdir(),
+            filename: fileName,
+            timemarks: [(Math.floor(Math.random() * 15) + 1) + "%"],
+			size: "500x?"
+        })
+        .on('end', () => {
+            let dataURL = fs.readFileSync(filePath + ".png", 'base64');
+            fs.unlinkSync(filePath + ".png");
+            resolve(dataURL);
+        })
+        .on('error', (err) => {
+            reject(err);
+        })
+    });
+}
+
 
 // The following functions are triggered when a new entity is added or
 // modified in Google Cloud Storage
 
 const runtimeOpts = {
-	timeoutSeconds: 60,
+	timeoutSeconds: 90,
 	memory: '2GB'
 }
 
@@ -155,3 +232,23 @@ exports.processJson = functions
 	.onFinalize(async (object) => {
 		await addSearchRecords(object)
 	})
+
+exports.search = functions.runWith(runtimeOpts).https.onRequest(async (req, res) => {
+	let queryParams = {
+		"query": req.query.q,
+		"sortType": req.query.sort || "relevant",
+		"page": req.query.page || 1,
+		"per_page": req.query.per_page || 25,
+	}
+	let resData = await makeSearchRequest(queryParams);
+
+	res.send(resData);
+});
+
+exports.generate_thumbnail = functions.runWith(runtimeOpts).https.onRequest(async (req, res) => {
+	let videoURL = req.query.video_url;
+
+	let imageData = await generateThumbnail(videoURL);
+
+	return res.send(imageData);
+});

@@ -33,7 +33,7 @@ with open(metadata_file) as json_file:
     metadata = json.load(json_file)
 metadata_video_list = metadata["files"]
 
-local_video_list = find(prefix_path, "-type", "f", "-iregex", ".*\.\(mov\|mp4\|avi\|wmv\|mpeg\|vob\)", _iter=True)
+local_video_list = list(find(prefix_path, "-type", "f", "-iregex", ".*\.\(mov\|mp4\|avi\|wmv\|mpeg\|vob\)", _iter=True))
 gs_video_list = [val[:-1] for val in gsutil("ls", "-r", os.path.join(gcloud_video_bucket, "**"), _iter=True)]
 
 print("# of files yet to be uploaded:", len(local_video_list) - len(gs_video_list))
