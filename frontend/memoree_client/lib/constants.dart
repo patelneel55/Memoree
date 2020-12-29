@@ -14,3 +14,5 @@ class ActionNames {
   static const String upload = "Upload";
   static const String search = "Search";
 }
+
+const List<String> PRESET_QUERIES = ["Father's Day", "Birthday", "Baby"];

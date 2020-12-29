@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:memoree_client/search.dart';
-import 'constants.dart';
+import 'package:memoree_client/widgets/app_bar.dart';
+import 'package:memoree_client/widgets/grid_results.dart';
 import 'drawer.dart';
 
 class AppScaffold extends StatelessWidget {
@@ -12,72 +12,26 @@ class AppScaffold extends StatelessWidget {
     final bool isTabletLayout = MediaQuery.of(context).size.width < 1008;
 
     return Scaffold(
-      appBar: appBar(isMobileLayout, isTabletLayout),
-      drawer: appDrawer(isMobileLayout, isTabletLayout),
-      body: Row(
-        children: <Widget>[
-          if(!isMobileLayout)
-            AppDrawer()
-        ]
+      appBar: CustomAppBar(
+        isMobile: isMobileLayout,
+        isTablet: isTabletLayout
       ),
-    );
-  }
-
-  AppBar appBar(bool isMobile, bool isTablet)
-  {
-    return AppBar(
-      toolbarHeight: 75,
-      elevation: 1,
-      // automaticallyImplyLeading: false,
-      flexibleSpace: Container(),
-      centerTitle: true,  
-      title: Row(
-        children: <Widget>[
-          Text(PageTitles.appName),
-          if(!isTablet)
-            Flexible(
-              flex: 5,
-              child: Container(
-                constraints: BoxConstraints(minWidth: 100, maxWidth: 800),
-                padding: const EdgeInsets.all(100.0),
-                child: SearchWidget(),
+      drawer: isMobileLayout ? AppDrawer() : null,
+      body: SafeArea(
+        child: Container(
+          child: Row(
+            children: <Widget>[
+              if(!isMobileLayout)
+                AppDrawer(),
+              Container(
+                child: Expanded(
+                  child: ContentGrid()
+                )
               )
-            ),
-          // Expanded(flex: 2, child: Container())
-        ],
-      ),
-      actions: <Widget>[
-        if(isTablet)
-          Container(
-            padding: const EdgeInsets.only(right: 10.0, left: 10.0),
-            child: IconButton(
-              icon: const Icon(Icons.search_outlined),
-              tooltip: ActionNames.search,
-              splashRadius: 25,
-              onPressed: () => {},
-            ) 
-          ),
-        Container(
-          padding: const EdgeInsets.only(right: 10.0, left: 10.0),
-          child: IconButton(
-            icon: const Icon(Icons.cloud_upload_outlined),
-            tooltip: ActionNames.upload,
-            splashRadius: 25,
-            onPressed: () => {}
-          ),
-        ),
-        if(!isMobile)
-        Container(
-          padding: const EdgeInsets.only(right: 10.0, left: 10.0),
-          child: IconButton(
-            icon: const Icon(Icons.settings_outlined),
-            tooltip: ActionNames.settings,
-            splashRadius: 25,
-            onPressed: () => {}
-          ),
-        ),
-        Container(padding: const EdgeInsets.all(5.0)),
-      ]
+            ]
+          ) 
+        )
+      )
     );
   }
 

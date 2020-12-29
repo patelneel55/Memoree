@@ -12,9 +12,10 @@ class _SearchWidgetState extends State<SearchWidget> {
     return TextFormField(
       decoration: InputDecoration(
         labelText: "Search",
+        contentPadding: EdgeInsets.all(10.0),
         prefixIcon: Icon(Icons.search),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10.0),
+          borderRadius: BorderRadius.circular(7.0),
           borderSide: new BorderSide()
         )
       ),
