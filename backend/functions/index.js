@@ -189,6 +189,7 @@ function generateThumbnail(videoURL) {
             folder: os.tmpdir(),
             filename: fileName,
             timemarks: [(Math.floor(Math.random() * 15) + 1) + "%"],
+			size: "500x?"
         })
         .on('end', () => {
             let dataURL = fs.readFileSync(filePath + ".png", 'base64');
