@@ -1,5 +1,8 @@
+import 'dart:convert';
+import 'dart:io';
+import 'dart:math';
+
 import 'package:cloud_functions/cloud_functions.dart';
-import 'dart:io' as io;
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
 
@@ -8,7 +11,7 @@ class VideoData {
   final String videoUrl;
   final DateTime timestamp;
   final List<dynamic> data;
-  final String thumbnailPath;
+  String thumbnailPath;
 
   VideoData({this.filename, this.videoUrl, int timestamp, this.data}) : this.timestamp = timestamp != null ? DateTime.fromMillisecondsSinceEpoch(timestamp) : null, this.thumbnailPath = "";
 
@@ -22,9 +25,9 @@ class VideoData {
     );
   }
 
-  Future<String> getThumbnail()
+  Future<String> getThumbnail() async
   {
-    if(!this.thumbnailPath.isEmpty)
+    if(this.thumbnailPath.isNotEmpty)
       return this.thumbnailPath;
     
     final HttpsCallable funcCallable = FirebaseFunctions.instance.httpsCallable("generate_thumbnail");
@@ -37,7 +40,7 @@ class VideoData {
       do {
         String fileName = String.fromCharCodes(List.generate(7, (index) => Random.secure().nextInt(33) + 89)) + ".png";
         filePath = path.join((await getApplicationDocumentsDirectory()).path, fileName);
-      } while(File(filePath).exists());
+      } while(await File(filePath).exists());
 
       thumb.copySync(filePath);
       this.thumbnailPath = filePath;
@@ -51,7 +54,8 @@ class VideoData {
   }
 }
 
-Future<List<VideoData>> fetchSearchResults(String query, {int page : 1}) async {
+Future<List<VideoData>> fetchSearchResults(String query, {int page : 1}) async
+{
   final HttpsCallable funcCallable = FirebaseFunctions.instance.httpsCallable("search");
 
   try {
