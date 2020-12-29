@@ -8,17 +8,19 @@ import 'package:path_provider/path_provider.dart';
 
 class VideoData {
   final String filename;
+  final String filePath;
   final String videoUrl;
   final DateTime timestamp;
   final List<dynamic> data;
   String thumbnailPath;
 
-  VideoData({this.filename, this.videoUrl, int timestamp, this.data}) : this.timestamp = timestamp != null ? DateTime.fromMillisecondsSinceEpoch(timestamp) : null, this.thumbnailPath = "";
+  VideoData({this.filename, this.filePath, this.videoUrl, int timestamp, this.data}) : this.timestamp = timestamp != null ? DateTime.fromMillisecondsSinceEpoch(timestamp) : null, this.thumbnailPath = "";
 
   factory VideoData.fromJson(Map<String, dynamic> json) {
 
     return VideoData(
-      filename: json['file_name'],
+      filename: json['file_name'].split('/').last,
+      filePath: json['file_name'].split('/').removeLast().join('/'),
       videoUrl: json['videoURL'],
       timestamp: json['timestamp'],
       data: json['document']
