@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+
+import 'package:memoree_client/drawer.dart';
 import 'package:memoree_client/widgets/app_bar.dart';
 import 'package:memoree_client/widgets/grid_results.dart';
-import 'drawer.dart';
 
 class AppScaffold extends StatelessWidget {
   final String page;
