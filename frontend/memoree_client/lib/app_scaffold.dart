@@ -4,7 +4,8 @@ import 'package:memoree_client/widgets/grid_results.dart';
 import 'drawer.dart';
 
 class AppScaffold extends StatelessWidget {
-  const AppScaffold({Key key}) : super(key: key);
+  final String page;
+  const AppScaffold({Key key, this.page}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -12,33 +13,20 @@ class AppScaffold extends StatelessWidget {
     final bool isTabletLayout = MediaQuery.of(context).size.width < 1008;
 
     return Scaffold(
-      appBar: CustomAppBar(
-        isMobile: isMobileLayout,
-        isTablet: isTabletLayout
-      ),
-      drawer: isMobileLayout ? AppDrawer() : null,
-      body: SafeArea(
-        child: Container(
-          child: Row(
-            children: <Widget>[
-              if(!isMobileLayout)
-                AppDrawer(),
-              Container(
-                child: Expanded(
-                  child: ContentGrid()
-                )
-              )
-            ]
-          ) 
-        )
-      )
-    );
+        appBar:
+            CustomAppBar(isMobile: isMobileLayout, isTablet: isTabletLayout),
+        drawer: isMobileLayout ? AppDrawer() : null,
+        body: SafeArea(
+            child: Container(
+                child: Row(children: <Widget>[
+          if (!isMobileLayout) AppDrawer(),
+          Container(
+              child: Expanded(child: page == "videos" ? ContentGrid() : null))
+        ]))));
   }
 
-  Widget appDrawer(bool isMobile, bool isTablet)
-  {
-    if(isMobile)
-      return AppDrawer();
+  Widget appDrawer(bool isMobile, bool isTablet) {
+    if (isMobile) return AppDrawer();
 
     return null;
   }
