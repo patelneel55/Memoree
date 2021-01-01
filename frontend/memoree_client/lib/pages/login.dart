@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:memoree_client/app/services/firebase_auth.dart';
 import 'package:memoree_client/app_scaffold.dart';
+import 'package:memoree_client/constants.dart';
 
 class LoginPage extends StatefulWidget {
   @override
@@ -18,7 +19,8 @@ class _LoginPageState extends State<LoginPage> {
               mainAxisSize: MainAxisSize.max,
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
-                FlutterLogo(size: 150),
+                Image(image: AssetImage("logos/memoree_logo.png"), height: 275,),
+                Text(PageTitles.appName, textScaleFactor: 2, style: TextStyle(color: Color(0xffb83b5e), letterSpacing: 1, fontWeight: FontWeight.w600),),
                 SizedBox(height: 50,),
                 OutlineButton(
                   splashColor: Colors.grey,
