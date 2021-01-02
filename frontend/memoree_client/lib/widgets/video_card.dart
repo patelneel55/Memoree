@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:fading_edge_scrollview/fading_edge_scrollview.dart';
 import 'package:flutter/material.dart';
 
 import 'package:memoree_client/thumbnail.dart';
@@ -86,51 +87,33 @@ class _VideoCardState extends State<VideoCard> {
                           children: <Widget>[
                             Text("Hello World"),
                             SizedBox(height: 5),
-                            // ShaderMask(
-                            //   shaderCallback: (Rect bounds) {
-                            //     return LinearGradient(
-                            //       colors: [Colors.white, Colors.white.withOpacity(0.05)],
-                            //       stops: [0.7, 1],
-                            //       tileMode: TileMode.mirror
-                            //     ).createS;
-                            //   },
-                            //   child: SingleChildScrollView(
-                            //     scrollDirection: Axis.horizontal,
-                            //     controller: _scrollController,
-                            //     child: Text(
-                            //         "This is an extremely long text its so long that it is sometimes rendered weirdly",
-                            //         textScaleFactor: 0.9,
-                            //         style: TextStyle(color: Colors.black54),
-                            //       )
-                            //   ),
-                            // ),
-                            Container(
-                                  decoration: BoxDecoration(
-        color: Colors.white,
-          gradient: LinearGradient(
-                                  colors: [Colors.white, Colors.white.withOpacity(0.05)],
-                                  stops: [0.7, 1],
-                                  tileMode: TileMode.mirror
-                                )),
-                                  child: SingleChildScrollView(
-                                    scrollDirection: Axis.horizontal,
-                                    controller: _scrollController,
-                                    child: Text(
-                                        "This is an extremely long text its so long that it is sometimes rendered weirdly",
-                                        textScaleFactor: 0.9,
-                                        style: TextStyle(color: Colors.black54),
-                                      )
+                            Stack(
+                              children: <Widget>[
+                                SingleChildScrollView(
+                                  scrollDirection: Axis.horizontal,
+                                  controller: _scrollController,
+                                  child: Text(
+                                      "This is an extremely long text its so long that it is sometimes rendered weirdly ",
+                                      textScaleFactor: 0.9,
+                                      style: TextStyle(color: Colors.black54),
+                                    )
+                                ),
+                                Positioned.fill(
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      gradient: LinearGradient(
+                                        begin: Alignment.centerRight,
+                                        end: Alignment.centerLeft,
+                                        stops: [0, 0.065],
+                                        colors: [
+                                          Theme.of(context).scaffoldBackgroundColor,
+                                          Theme.of(context).scaffoldBackgroundColor.withOpacity(0),
+                                        ],
+                                      ),
+                                    ),
                                   ),
                                 ),
-                            Flexible(
-                              child: Text(
-                                "This is an extremely long text its so long that it is sometimes rendered weirdly",
-                                maxLines: 1,
-                                softWrap: false,
-                                overflow: TextOverflow.fade,
-                                textScaleFactor: 0.9,
-                                style: TextStyle(color: Colors.black54),
-                              ) 
+                              ],
                             ),
                           ],
                         ),
