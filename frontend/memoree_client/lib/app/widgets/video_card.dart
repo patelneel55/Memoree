@@ -1,6 +1,4 @@
 import 'dart:ui';
-
-import 'package:fading_edge_scrollview/fading_edge_scrollview.dart';
 import 'package:flutter/material.dart';
 
 import 'package:memoree_client/app/widgets/thumbnail.dart';
