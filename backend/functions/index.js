@@ -28,9 +28,9 @@ const videoIntel = require('@google-cloud/video-intelligence');
 const fs = require('fs');
 const path = require('path');
 const os = require('os');
+const spawn = require('child_process').spawn;
 
-const ffmpeg = require('fluent-ffmpeg');
-ffmpeg.setFfmpegPath(require('@ffmpeg-installer/ffmpeg').path);
+const ffmpegInstallation = require('@ffmpeg-installer/ffmpeg');
 
 const utils = require('./utils.js');
 const algolia = require('./algolia.js');
@@ -180,26 +180,27 @@ function generateThumbnail(videoURL) {
 
     do {
         var fileName = Math.random().toString(36).substring(7);
-        var filePath = path.join(os.tmpdir(), fileName);
-    } while(fs.existsSync(filePath + ".png"));
+        var filePath = path.join(os.tmpdir(), fileName) + ".bmp";
+	} while(fs.existsSync(filePath));
 
-    return new Promise((resolve, reject) => {
-        ffmpeg(videoURL)
-        .screenshots({
-            folder: os.tmpdir(),
-            filename: fileName,
-            timemarks: [(Math.floor(Math.random() * 15) + 1) + "%"],
-			size: "500x?"
-        })
-        .on('end', () => {
-            let dataURL = fs.readFileSync(filePath + ".png", 'base64');
-            fs.unlinkSync(filePath + ".png");
-            resolve(dataURL);
-        })
-        .on('error', (err) => {
-            reject(err);
-        })
-    });
+	return new Promise((resolve, reject) => {
+		let cmd = ffmpegInstallation.path;
+		let args = [
+			'-y',
+			'-i', videoURL,
+			'-frames:v', '1',
+			filePath
+		]
+		let proc = spawn(cmd, args);
+		proc.on('close', function(code) {
+			if(code != 0)
+				return reject("FFMPEG error occured.");
+
+			let dataURL = fs.readFileSync(filePath, 'base64');
+			fs.unlinkSync(filePath);
+			return resolve(dataURL);
+		});
+	});
 }
 
 
