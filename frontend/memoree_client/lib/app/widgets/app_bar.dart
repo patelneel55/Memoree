@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+
 import 'package:memoree_client/app/services/firebase_auth.dart';
-import 'package:memoree_client/constants.dart';
+import 'package:memoree_client/app/models/constants.dart';
+import 'package:memoree_client/app/widgets/account_info.dart';
 import 'package:memoree_client/search.dart';
-import 'package:memoree_client/widgets/account_info.dart';
 
 class CustomAppBar extends StatefulWidget with PreferredSizeWidget {
   final bool isMobile, isTablet;
@@ -28,7 +29,8 @@ class _CustomAppBarState extends State<CustomAppBar> {
         centerTitle: true,
         title: Row(
           children: <Widget>[
-            Text(PageTitles.appName),
+            Text(PageTitles.appName, style: TextStyle(fontWeight: FontWeight.w400, fontFamily: "ProductSans")),
+            SizedBox(width: 8,),
             if (!widget.isTablet)
               Flexible(
                   flex: 5,
@@ -93,7 +95,7 @@ class _CustomAppBarState extends State<CustomAppBar> {
                               barrierDismissible: true,
                               builder: (context) {
                                 return Align(
-                                  alignment: Alignment(0.98, -0.84),
+                                  alignment: Alignment(0.98, -0.79),
                                   child: Material(
                                     shape:
                                         RoundedRectangleBorder(borderRadius: BorderRadius.circular(5.0)),

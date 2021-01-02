@@ -34,6 +34,7 @@ dependencies:
   provider: ^4.3.2+3
   video_player: ^1.0.1
   video_thumbnail_generator: ^0.0.6
+  fading_edge_scrollview: ^1.1.4
 
 dev_dependencies:
   flutter_test:

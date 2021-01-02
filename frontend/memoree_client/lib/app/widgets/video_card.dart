@@ -3,8 +3,8 @@ import 'dart:ui';
 import 'package:fading_edge_scrollview/fading_edge_scrollview.dart';
 import 'package:flutter/material.dart';
 
-import 'package:memoree_client/thumbnail.dart';
-import 'package:memoree_client/video_data.dart';
+import 'package:memoree_client/app/widgets/thumbnail.dart';
+import 'package:memoree_client/app/models/video_data.dart';
 
 class VideoCard extends StatefulWidget {
   final VideoData videoData;

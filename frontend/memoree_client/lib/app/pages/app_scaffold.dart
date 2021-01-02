@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
-import 'package:memoree_client/drawer.dart';
-import 'package:memoree_client/widgets/app_bar.dart';
-import 'package:memoree_client/widgets/grid_results.dart';
+import 'package:memoree_client/app/pages/video_page.dart';
+import 'package:memoree_client/app/widgets/app_bar.dart';
+import 'package:memoree_client/app/widgets/drawer.dart';
 
 class AppScaffold extends StatelessWidget {
   final String page;
@@ -16,19 +16,13 @@ class AppScaffold extends StatelessWidget {
     return Scaffold(
         appBar:
             CustomAppBar(isMobile: isMobileLayout, isTablet: isTabletLayout),
-        drawer: isMobileLayout ? AppDrawer() : null,
+        drawer: isMobileLayout ? AppDrawer(isMobile: isMobileLayout,) : null,
         body: SafeArea(
             child: Container(
                 child: Row(children: <Widget>[
-          if (!isMobileLayout) AppDrawer(),
+          if (!isMobileLayout) AppDrawer(isMobile: isMobileLayout,),
           Container(
-              child: Expanded(child: page == "videos" ? ContentGrid() : null))
+              child: Expanded(child: VideoPage()))
         ]))));
-  }
-
-  Widget appDrawer(bool isMobile, bool isTablet) {
-    if (isMobile) return AppDrawer();
-
-    return null;
   }
 }

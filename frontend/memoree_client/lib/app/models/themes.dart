@@ -3,13 +3,13 @@ import 'package:flutter/material.dart';
 class AppTheme {
   AppTheme._();
 
-  static Color _iconColor = Colors.redAccent.shade200;
+  static Color _iconColor = Colors.black87;
 
   static const Color _lightPrimaryColor = Colors.white;
   static const Color _lightPrimaryVariantColor = Colors.white;
   static const Color _lightSecondaryColor = Colors.green;
-  static const Color _lightOnPrimaryColor = Colors.black;
-  static const String _fontFamily = "OpenSans";
+  static const Color _lightOnPrimaryColor = Color(0xff3c4043);
+  static const String _fontFamily = "Montserrat";
 
   static final ThemeData lightTheme = ThemeData(
     fontFamily: _fontFamily,

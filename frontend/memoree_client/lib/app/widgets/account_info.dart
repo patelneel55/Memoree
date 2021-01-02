@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'package:memoree_client/app/pages/login.dart';
 import 'package:memoree_client/app/services/firebase_auth.dart';
-import 'package:memoree_client/app_scaffold.dart';
-import 'package:memoree_client/pages/login.dart';
 
 class AccountInfo extends StatefulWidget {
   @override
@@ -12,22 +11,6 @@ class AccountInfo extends StatefulWidget {
 class _AccountInfoState extends State<AccountInfo> {
   @override
   Widget build(BuildContext context) {
-    // return Container(
-    //   child: Center(
-    //     child: Column(
-    //       mainAxisSize: MainAxisSize.min,
-    //       children: <Widget>[
-    //         CircleAvatar(
-    //           radius: 30,
-    //           child: ClipOval(
-    //             child: Image.network(widget.photoUrl, fit: BoxFit.cover),
-    //           ),
-    //         )
-    //       ],
-    //     )
-    //   ),
-    // );
-
     return FutureBuilder(
       future: FirebaseAuthService().currentUser(),
       builder: (context, snapshot) {
@@ -76,20 +59,6 @@ class _AccountInfoState extends State<AccountInfo> {
                         padding: const EdgeInsets.all(10),
                         child: Text("Sign out", textScaleFactor: 1.1,)
                       ),
-                      // child: Padding(
-                      //   padding: const EdgeInsets.only(top: 10.0, bottom: 10.0),
-                      //   child: Row(
-                      //     mainAxisSize: MainAxisSize.min,
-                      //     mainAxisAlignment: MainAxisAlignment.center,
-                      //     children: <Widget>[
-                      //       Image(image: AssetImage("logos/google_logo.png"), height: 30.0),
-                      //       Padding(
-                      //         padding: const EdgeInsets.only(left: 10.0),
-                      //         child: Text("Sign in with Google")
-                      //       ),
-                      //     ],
-                      //   ),
-                      // ),
                     ),
                   ],
               ),

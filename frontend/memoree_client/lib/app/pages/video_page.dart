@@ -1,17 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:memoree_client/widgets/grid_results.dart';
+
+import 'package:memoree_client/app/widgets/grid_results.dart';
 
 class VideoPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    // return Container(
-    //   padding: const EdgeInsets.only(top: 10.0),
-    //   child: Column(
-    //     children: <Widget>[
-    //       Text()
-    //     ],
-    //   ),
-    // );
     return FutureBuilder(
       future: Future.delayed(Duration(seconds: 3)),
       builder: (context, snapshot) {
