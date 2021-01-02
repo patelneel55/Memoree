@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:memoree_client/video_data.dart';
+import 'package:memoree_client/app/models/video_data.dart';
 
 class ThumbnailGenerator extends StatelessWidget {
   final VideoData videoData;

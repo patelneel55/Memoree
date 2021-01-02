@@ -139,13 +139,6 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
-  flutter_staggered_grid_view:
-    dependency: "direct main"
-    description:
-      name: flutter_staggered_grid_view
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "0.3.3"
   flutter_test:
     dependency: "direct dev"
     description: flutter
@@ -378,13 +371,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.1.4+1"
-  video_thumbnail_generator:
-    dependency: "direct main"
-    description:
-      name: video_thumbnail_generator
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "0.0.6"
   win32:
     dependency: transitive
     description:
@@ -401,4 +387,4 @@ packages:
     version: "0.1.2"
 sdks:
   dart: ">=2.12.0-0.0 <3.0.0"
-  flutter: ">=1.17.0 <2.0.0"
+  flutter: ">=1.12.13+hotfix.5 <2.0.0"

@@ -26,10 +26,20 @@
   <!-- Favicon -->
   <link rel="icon" type="image/png" href="favicon.png"/>
 
-  <title>memoree_client</title>
+  <title>Memoree</title>
   <link rel="manifest" href="manifest.json">
 </head>
 <body>
+  <!-- Import secrets to allow Firebase authentication along with Google
+       Single-Sign-On -->
+  <script type='text/javascript' src='secrets.js'></script>
+  <script>
+    var link = document.createElement('meta');
+    link.setAttribute('name', 'google-signin-client_id');
+    link.setAttribute('content', secrets.client_id);
+    document.getElementsByTagName('head')[0].appendChild(link);
+  </script>
+
   <!-- This script installs service_worker.js to provide PWA functionality to
        application. For more information, see:
        https://developers.google.com/web/fundamentals/primers/service-workers -->
@@ -40,6 +50,29 @@
       });
     }
   </script>
+  <script src="https://www.gstatic.com/firebasejs/8.2.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.2.1/firebase-analytics.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.2.1/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.2.1/firebase-functions.js"></script>
+  <script>
+    // Your web app's Firebase configuration
+    // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+    var firebaseConfig = {
+      apiKey: secrets.apiKey,
+      authDomain: secrets.project_id + ".firebaseapp.com",
+      databaseURL: "https://" + secrets.project_id + ".firebaseio.com",
+      projectId: secrets.project_id,
+      storageBucket: secrets.project_id + ".appspot.com",
+      messagingSenderId: secrets.messagingSenderId,
+      appId: secrets.appId,
+      measurementId: secrets.measurementId
+    };
+    // Initialize Firebase
+    console.log(firebaseConfig);
+    firebase.initializeApp(firebaseConfig);
+    firebase.analytics();
+  </script>
+
   <script src="main.dart.js" type="application/javascript"></script>
 </body>
 </html>
