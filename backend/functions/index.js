@@ -150,7 +150,7 @@ async function makeSearchRequest(queryParams)
 			return {
 				"file_name": obj.document.file_name,
 				"confidence": obj.document.confidence,
-				"data": obj.document
+				"document": obj.document
 			}
 		});
 
@@ -235,22 +235,33 @@ exports.processJson = functions
 		await addSearchRecords(object)
 	})
 
-exports.search = functions.runWith(runtimeOpts).https.onRequest(async (req, res) => {
-	let queryParams = {
-		"query": req.query.q,
-		"sortType": req.query.sort || "relevant",
-		"page": req.query.page || 1,
-		"per_page": req.query.per_page || 25,
-	}
-	let resData = await makeSearchRequest(queryParams);
+exports.search = functions.runWith(runtimeOpts).https.onCall((data, context) => {
+	return new Promise(async (resolve, reject) => {
+		let queryParams = {
+			"query": data.q,
+			"sortType": data.sort || "relevant",
+			"page": data.page || 1,
+			"per_page": data.per_page || 25,
+		}
 
-	res.send(resData);
+		try{
+			let resData = await makeSearchRequest(queryParams);
+			resolve(resData);
+		}catch(err){
+			console.error(err);
+			reject(new functions.https.HttpsError(500, "Unexpected error occured.", err));
+		}
+	});
 });
 
-exports.generate_thumbnail = functions.runWith(runtimeOpts).https.onRequest(async (req, res) => {
-	let videoURL = req.query.video_url;
-
-	let imageData = await generateThumbnail(videoURL);
-
-	return res.send(imageData);
+exports.generate_thumbnail = functions.runWith(runtimeOpts).https.onCall((data, res) => {
+	return new Promise(async (resolve, reject) => {
+		try {
+			let imageData = await generateThumbnail(data.video_url);
+			resolve(imageData);
+		}catch(err){
+			console.error(err);
+			reject(new functions.https.HttpsError(500, "Unexpected error occured.", err));
+		}
+	});
 });

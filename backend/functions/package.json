@@ -16,6 +16,7 @@
     "@ffmpeg-installer/ffmpeg": "^1.0.20",
     "@google-cloud/video-intelligence": "^3.0.1",
     "algoliasearch": "^4.4.0",
+    "cors": "^2.8.5",
     "firebase-admin": "^8.13.0",
     "firebase-functions": "^3.8.0",
     "hashcode": "^1.0.3",
