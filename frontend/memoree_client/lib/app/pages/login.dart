@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import 'package:memoree_client/app/services/firebase_auth.dart';
 import 'package:memoree_client/app/pages/app_scaffold.dart';
 import 'package:memoree_client/app/models/constants.dart';
