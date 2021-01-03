@@ -22,7 +22,7 @@ class AppScaffold extends StatelessWidget {
                 child: Row(children: <Widget>[
           if (!isMobileLayout) AppDrawer(isMobile: isMobileLayout,),
           Container(
-              child: Expanded(child: VideoPage()))
+              child: Expanded(child: VideoPage("earth")))
         ]))));
   }
 }

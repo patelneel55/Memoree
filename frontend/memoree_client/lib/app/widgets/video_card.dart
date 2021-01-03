@@ -1,5 +1,6 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 import 'package:memoree_client/app/widgets/thumbnail.dart';
 import 'package:memoree_client/app/models/video_data.dart';
@@ -40,7 +41,7 @@ class _VideoCardState extends State<VideoCard> {
     {
       double maxExtent = _scrollController.position.maxScrollExtent;
       double distanceDifference = maxExtent - _scrollController.offset;
-      double durationDouble = distanceDifference / 20;
+      double durationDouble = distanceDifference / 30;
 
       _scrollController.animateTo(
         maxExtent,
@@ -69,7 +70,7 @@ class _VideoCardState extends State<VideoCard> {
               children: <Widget>[
                 AspectRatio(
                   aspectRatio: 3 / 2,
-                  child: ThumbnailGenerator(videoData: widget.videoData, dryrun: true)
+                  child: ThumbnailGenerator(videoData: widget.videoData, dryrun: false)
                 ),
                 Padding(
                   padding: EdgeInsets.only(bottom: 5.0, top: 5.0),
@@ -83,7 +84,7 @@ class _VideoCardState extends State<VideoCard> {
                           mainAxisAlignment: MainAxisAlignment.start,
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: <Widget>[
-                            Text("Hello World"),
+                            Text(widget.videoData.filename),
                             SizedBox(height: 5),
                             Stack(
                               children: <Widget>[
@@ -91,7 +92,8 @@ class _VideoCardState extends State<VideoCard> {
                                   scrollDirection: Axis.horizontal,
                                   controller: _scrollController,
                                   child: Text(
-                                      "This is an extremely long text its so long that it is sometimes rendered weirdly ",
+                                      widget.videoData.filePath,
+                                      // "This is an extremely long text its so long that it is sometimes rendered weirdly ",
                                       textScaleFactor: 0.9,
                                       style: TextStyle(color: Colors.black54),
                                     )
@@ -118,7 +120,11 @@ class _VideoCardState extends State<VideoCard> {
                       ),
                       Expanded(
                         flex: 3,
-                        child: Text("98%", textAlign: TextAlign.right, style: TextStyle(fontWeight: FontWeight.w500),)
+                        child: Text(
+                          NumberFormat("###.#%").format(widget.videoData.data["confidence"]),
+                          textAlign: TextAlign.right,
+                          style: TextStyle(fontWeight: FontWeight.w500),
+                        )
                       )
                     ]
                   )
