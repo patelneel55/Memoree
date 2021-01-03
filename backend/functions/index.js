@@ -172,6 +172,7 @@ async function makeSearchRequest(queryParams)
 
 		queryParams.page++;
 	}
+	tailoredResults = tailoredResults.slice(0, request_per_page);
 
 	return tailoredResults;
 }
