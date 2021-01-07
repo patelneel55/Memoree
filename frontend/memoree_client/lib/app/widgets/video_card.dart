@@ -156,10 +156,11 @@ class _VideoCardState extends State<VideoCard> {
                 _updateScrollingStatus();
               },
               onTap: () {
+                print(_videoData.videoUrl);
                 showDialog(
                   barrierColor: Colors.black87,
                   context: context,
-                  builder: (_) => PlayerPage(),
+                  builder: (_) => PlayerPage(_videoData),
                 );
               },
             ),
