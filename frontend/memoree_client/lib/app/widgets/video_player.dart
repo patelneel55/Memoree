@@ -25,7 +25,7 @@ class _VideoPlayerState extends State<VideoPlayer> {
     return Container(
       margin: const EdgeInsets.fromLTRB(10, 20, 10, 20),
       child: EasyWebView(
-        src: sprintf(videoPlayerContent, [widget.videoURL, "localhost", "8024"]) ,
+        src: sprintf(videoPlayerContent, [widget.videoURL, "34.68.8.90", "8024"]) ,
         onLoaded: () {
           if(!_isLoaded)
           {
@@ -71,7 +71,7 @@ class _VideoPlayerState extends State<VideoPlayer> {
       </head>
       <body>
           <div id="player_container">
-              <video id="video" class="video-js vjs-theme-forest" preload="auto" height="60%" disablePictureInPicture controls></video>
+              <video id="video" class="video-js vjs-theme-forest" preload="auto" width="640" height="480" disablePictureInPicture controls></video>
           </div>
 
           <script>
