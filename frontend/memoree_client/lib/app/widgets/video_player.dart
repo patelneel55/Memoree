@@ -1,13 +1,6 @@
-@JS()
-library video_player;
-
 import 'package:easy_web_view/easy_web_view.dart';
 import 'package:flutter/material.dart';
-import 'package:js/js.dart';
 import 'package:sprintf/sprintf.dart';
-
-@JS('executeStream')
-external void executeStream(dynamic path, dynamic host, dynamic port);
 
 class VideoPlayer extends StatefulWidget {
   final String videoURL;
@@ -18,21 +11,14 @@ class VideoPlayer extends StatefulWidget {
 }
 
 class _VideoPlayerState extends State<VideoPlayer> {
-  bool _isLoaded = false;
 
   @override
   Widget build(BuildContext context) {
     return Container(
       margin: const EdgeInsets.fromLTRB(10, 20, 10, 20),
       child: EasyWebView(
-        src: sprintf(videoPlayerContent, [widget.videoURL, "34.68.8.90", "8024"]) ,
-        onLoaded: () {
-          if(!_isLoaded)
-          {
-            _isLoaded = true;
-            // executeStream(widget.videoURL, "localhost", 8024);\
-          }
-        },
+        src: sprintf(videoPlayerContent, [widget.videoURL, "34.69.223.197", "8024"]) ,
+        onLoaded: () {},
         isHtml: true,
         isMarkdown: false,
       ),
