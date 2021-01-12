@@ -31,7 +31,7 @@ class _LoginPageState extends State<LoginPage> {
                         Navigator.of(context).pop();
                         Navigator.of(context).push(MaterialPageRoute(
                           builder: (context) {
-                            return AppScaffold(page: 'videos');
+                            return AppScaffold();
                           },
                         ),);
                       }

@@ -1,14 +1,13 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:memoree_client/app/models/video_data.dart';
+import 'package:memoree_client/app/services/video_data_provider.dart';
 
 import 'package:memoree_client/app/widgets/thumbnail.dart';
-import 'package:memoree_client/app/models/video_data.dart';
+import 'package:memoree_client/app/pages/player.dart';
 
 class VideoCard extends StatefulWidget {
-  final VideoData videoData;
-
-  VideoCard(this.videoData);
 
   @override
   _VideoCardState createState() => _VideoCardState();
@@ -18,12 +17,14 @@ class _VideoCardState extends State<VideoCard> {
   bool _isHovering;
   ScrollController _scrollController = ScrollController();
   bool _isScrolling;
+  Widget _thumbnailWidget; 
 
   @override
   void initState() {
     super.initState();
     _isHovering = false;
     _isScrolling = false;
+    _thumbnailWidget = null;
   }
 
   void _updateHoverStatus(bool status) {
@@ -59,6 +60,8 @@ class _VideoCardState extends State<VideoCard> {
 
   @override
   Widget build(BuildContext context) {
+    final VideoData _videoData = VideoDataProvider.of(context).videoData;
+
     return Stack(
       children: <Widget>[
         Positioned.fill(
@@ -70,7 +73,7 @@ class _VideoCardState extends State<VideoCard> {
               children: <Widget>[
                 AspectRatio(
                   aspectRatio: 3 / 2,
-                  child: ThumbnailGenerator(videoData: widget.videoData, dryrun: false)
+                  child: _thumbnailWidget ??= ThumbnailGenerator(videoData: _videoData, dryrun: false)
                 ),
                 Padding(
                   padding: EdgeInsets.only(bottom: 5.0, top: 5.0),
@@ -84,7 +87,7 @@ class _VideoCardState extends State<VideoCard> {
                           mainAxisAlignment: MainAxisAlignment.start,
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: <Widget>[
-                            Text(widget.videoData.filename),
+                            Text(_videoData.filename),
                             SizedBox(height: 5),
                             Stack(
                               children: <Widget>[
@@ -92,8 +95,7 @@ class _VideoCardState extends State<VideoCard> {
                                   scrollDirection: Axis.horizontal,
                                   controller: _scrollController,
                                   child: Text(
-                                      widget.videoData.filePath,
-                                      // "This is an extremely long text its so long that it is sometimes rendered weirdly ",
+                                      _videoData.filePath,
                                       textScaleFactor: 0.9,
                                       style: TextStyle(color: Colors.black54),
                                     )
@@ -121,7 +123,7 @@ class _VideoCardState extends State<VideoCard> {
                       Expanded(
                         flex: 3,
                         child: Text(
-                          NumberFormat("###.#%").format(widget.videoData.data["confidence"]),
+                          NumberFormat("###.#%").format(_videoData.data["confidence"]),
                           textAlign: TextAlign.right,
                           style: TextStyle(fontWeight: FontWeight.w500),
                         )
@@ -153,7 +155,14 @@ class _VideoCardState extends State<VideoCard> {
                 _updateHoverStatus(isHovering);
                 _updateScrollingStatus();
               },
-              onTap: () {},
+              onTap: () {
+                print(_videoData.videoUrl);
+                showDialog(
+                  barrierColor: Colors.black87,
+                  context: context,
+                  builder: (_) => PlayerPage(_videoData),
+                );
+              },
             ),
           ),
         ),

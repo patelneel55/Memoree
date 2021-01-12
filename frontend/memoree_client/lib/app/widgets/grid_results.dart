@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:memoree_client/app/models/video_data.dart';
+import 'package:memoree_client/app/services/video_data_provider.dart';
 import 'package:memoree_client/app/widgets/video_card.dart';
 
 class ContentGrid extends StatefulWidget {
@@ -25,7 +26,10 @@ class _ContentGridState extends State<ContentGrid> {
         childAspectRatio: 1.1,
       ),
       itemBuilder: (BuildContext context, int index) {
-        return VideoCard(widget.videoDataList[index]);
+        return VideoDataProvider(
+          child: VideoCard(),
+          videoData: widget.videoDataList[index]
+        );
       },
     );
   }
