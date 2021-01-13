@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:memoree_client/app/services/firebase_auth.dart';
 import 'package:memoree_client/app/models/constants.dart';
 import 'package:memoree_client/app/widgets/account_info.dart';
-import 'package:memoree_client/search.dart';
+import 'package:memoree_client/app/widgets/search_bar.dart';
 
 class CustomAppBar extends StatefulWidget with PreferredSizeWidget {
   final bool isMobile, isTablet;
