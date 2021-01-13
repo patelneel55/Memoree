@@ -143,14 +143,14 @@ async function makeSearchRequest(queryParams)
 			functions.config().memoree.search_apikey,
 			functions.config().memoree.search_index
 		);
-		if(searchResult.hits.length == 0)
+		if(searchResult.grouped_hits.length == 0)
 			break;
 
-		let results = searchResult.hits.map(obj => {
+		let results = searchResult.grouped_hits.map(obj => {
 			return {
-				"file_name": obj.document.file_name,
-				"confidence": obj.document.confidence,
-				"document": obj.document
+				"file_name": obj.hits[0].document.file_name,
+				"confidence": obj.hits[0].document.confidence,
+				"document": obj.hits[0].document
 			}
 		});
 
