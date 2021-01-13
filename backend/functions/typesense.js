@@ -158,7 +158,8 @@ exports.search = (queryParams, host, port, apiKey, targetIndex) => {
         'query_by': 'entity,keywords,text,transcript,file_name',
         'per_page': 250,
         'group_by': 'file_name',
-        'group_limit': 1
+        'group_limit': 1,
+        'num_typos': 1,
     }
     if(queryParams.sortType != "relevant")
         searchParameters["sort_by"] = queryParams.sortType
