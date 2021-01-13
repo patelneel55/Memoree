@@ -7,7 +7,7 @@ class AppTheme {
 
   static const Color _lightPrimaryColor = Colors.white;
   static const Color _lightPrimaryVariantColor = Colors.white;
-  static const Color _lightSecondaryColor = Colors.green;
+  static const Color _lightSecondaryColor = Colors.lightBlue;
   static const Color _lightOnPrimaryColor = Color(0xff3c4043);
   static const String _fontFamily = "Montserrat";
 
@@ -30,6 +30,10 @@ class AppTheme {
     ),
     textTheme: _lightTextTheme,
     canvasColor: _lightPrimaryColor,
+    textSelectionTheme: TextSelectionThemeData(
+      cursorColor: _lightOnPrimaryColor,
+      selectionColor: _lightSecondaryColor.withOpacity(0.5),
+    ),
   );
   
   static final TextTheme _lightTextTheme = TextTheme(

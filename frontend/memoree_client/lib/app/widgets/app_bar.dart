@@ -15,7 +15,7 @@ class CustomAppBar extends StatefulWidget with PreferredSizeWidget {
   _CustomAppBarState createState() => _CustomAppBarState();
 
   @override
-  Size get preferredSize => Size.fromHeight(kToolbarHeight);
+  Size get preferredSize => Size.fromHeight(65);
 }
 
 class _CustomAppBarState extends State<CustomAppBar> {
@@ -29,7 +29,7 @@ class _CustomAppBarState extends State<CustomAppBar> {
         centerTitle: true,
         title: Row(
           children: <Widget>[
-            Text(PageTitles.appName, style: TextStyle(fontWeight: FontWeight.w400, fontFamily: "ProductSans")),
+            Text(PageTitles.appName, style: TextStyle(fontWeight: FontWeight.w500)),
             SizedBox(width: 8,),
             if (!widget.isTablet)
               Flexible(
