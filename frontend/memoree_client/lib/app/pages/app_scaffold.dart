@@ -42,7 +42,7 @@ class AppScaffold extends StatelessWidget {
                             return Container(
                               child: search.query == null ? 
                                 Center(child: Text("Carousel Page goes here")) :
-                                VideoPage(search.query) 
+                                VideoPage(search.query)
                             );
                             break;
                           case PageTitles.folders:

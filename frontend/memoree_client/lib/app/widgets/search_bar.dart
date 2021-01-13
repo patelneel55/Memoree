@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
 import 'package:memoree_client/app/models/drawer_state.dart';
 import 'package:memoree_client/app/models/search_state.dart';
-import 'package:provider/provider.dart';
 
 class SearchWidget extends StatefulWidget {
   @override
