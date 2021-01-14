@@ -3,7 +3,7 @@ import 'package:memoree_client/app/models/constants.dart';
 import 'package:memoree_client/app/widgets/carousel.dart';
 
 class LandingPage extends StatelessWidget {
-  // final List<Carousel> carouselList = PRESET_QUERIES.map<Carousel>((query) => Carousel(query));
+  final List<Carousel> carouselList = PRESET_QUERIES.map<Carousel>((query) => Carousel(query)).toList();
 
   @override
   Widget build(BuildContext context) {
@@ -11,19 +11,19 @@ class LandingPage extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
       child: SingleChildScrollView(
           child: Column(
-          children: <Widget>[
-            SizedBox(
-              height: 40,
-              child: Center(
-                child: Text("Common Topics", textScaleFactor: 1.75,),
+            children: <Widget>[
+              SizedBox(
+                height: 40,
+                child: Center(
+                  child: Text("Common Topics", textScaleFactor: 1.75,),
+                ),
               ),
-            ),
-            Divider(),
-            Carousel("Hello World"),
-            Carousel("Earthy hi hi"),
-            Carousel("WUT WUT WUT"),
-            SizedBox(height: 50,)
-          ],
+              Divider(),
+            ] +
+            carouselList +
+            [
+              SizedBox(height: 50,),
+            ],
         ),
       ),
     );

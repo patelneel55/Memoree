@@ -1,6 +1,16 @@
 import 'dart:math';
-
+import 'package:async/async.dart';
 import 'package:flutter/material.dart';
+
+import 'package:memoree_client/app/services/search.dart';
+import 'package:memoree_client/app/services/video_data_provider.dart';
+import 'package:memoree_client/app/widgets/video_card.dart';
+
+extension StringExtension on String {
+  String capitalize() {
+    return "${this[0].toUpperCase()}${this.substring(1)}";
+  }
+}
 
 class Carousel extends StatefulWidget {
   final String query;
@@ -15,6 +25,8 @@ class _CarouselState extends State<Carousel> {
   bool _atStart, _atEnd;
   ScrollController _scrollController;
   ListView _listView;
+  AsyncMemoizer _memoizer = AsyncMemoizer();
+
 
   @override
   void initState() {
@@ -25,22 +37,24 @@ class _CarouselState extends State<Carousel> {
     _scrollController = new ScrollController();
     _scrollController.addListener(_scrollListener);
 
-    _listView = ListView.builder(
-      shrinkWrap: true,
-      scrollDirection: Axis.horizontal,
-      itemCount: 50,
-      controller: _scrollController,
-      itemBuilder: (context, index) {
-        return Container(
-          decoration: BoxDecoration(
-            color: [Colors.red, Colors.green, Colors.yellow][Random().nextInt(3)]
-          ),
-          height: 100,
-          width: 100,
-          child: Center(child: Text("$index")),
-        );
-      },
-    );
+    _listView = null;
+    
+    // ListView.builder(
+    //   shrinkWrap: true,
+    //   scrollDirection: Axis.horizontal,
+    //   itemCount: 50,
+    //   controller: _scrollController,
+    //   itemBuilder: (context, index) {
+    //     return Container(
+    //       decoration: BoxDecoration(
+    //         color: [Colors.red, Colors.green, Colors.yellow][Random().nextInt(3)]
+    //       ),
+    //       height: 100,
+    //       width: 100,
+    //       child: Center(child: Text("$index")),
+    //     );
+    //   },
+    // );
   }
 
   void _scrollListener() {
@@ -84,82 +98,111 @@ class _CarouselState extends State<Carousel> {
               alignment: Alignment.centerLeft,
               child: Padding(
                 padding: EdgeInsets.only(top: 15.0, bottom: 15.0),
-                child: Text("HELLO WORLD", textAlign: TextAlign.left,)
+                child: Text(widget.query.capitalize(), textAlign: TextAlign.left,)
               ) 
             ),
             Container(
-              height: 300,
-              child: Stack(
-                children: [
-                  Positioned.fill(
-                    child: _listView,
-                  ),
-                  if(!_atStart)
-                    Positioned(
-                      top: 0,
-                      left: 0,
-                      height: 300,
-                      width: 100,
-                      child: Container(
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            begin: Alignment.centerLeft,
-                            end: Alignment.centerRight,
-                            stops: [0, 0.2],
-                            colors: [
-                              Theme.of(context).scaffoldBackgroundColor,
-                              Theme.of(context).scaffoldBackgroundColor.withOpacity(0),
-                            ],
+              height: 500,
+              child: FutureBuilder(
+                future: _memoizer.runOnce(() async { return SearchService.fetchSearchResults(widget.query, perPage: 10); }),
+                builder: (context, snapshot) {
+                  switch(snapshot.connectionState) {
+                    case ConnectionState.none:
+                    case ConnectionState.waiting:
+                      return Center(child: CircularProgressIndicator());
+                      break;
+                    case ConnectionState.active:
+                    case ConnectionState.done:
+                      return Stack(
+                        children: [
+                          Positioned.fill(
+                            child: _listView ??= ListView.builder(
+                              shrinkWrap: true,
+                              scrollDirection: Axis.horizontal,
+                              itemCount: snapshot.data != null ? snapshot.data.length : 0,
+                              controller: _scrollController,
+                              itemBuilder: (context, index) {
+                                return VideoDataProvider(
+                                  child: VideoCard(),
+                                  videoData: snapshot.data[index]
+                                );
+                              },
+                            ),
                           ),
-                        ),
-                      ),
-                    ),
-                  if(!_atStart)
-                    Positioned(
-                      top: 0,
-                      left: 0,
-                      height: 300,
-                      child: TextButton(
-                        child: Icon(Icons.keyboard_arrow_left, color: Colors.black,size: 36,),
-                        onPressed: () {
-                          _moveListRight(false);
-                        },
-                      ),
-                    ),
-                  if(!_atEnd)
-                    Positioned(
-                      top: 0,
-                      right: 0,
-                      height: 300,
-                      width: 100,
-                      child: Container(
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            begin: Alignment.centerRight,
-                            end: Alignment.centerLeft,
-                            stops: [0, 0.2],
-                            colors: [
-                              Theme.of(context).scaffoldBackgroundColor,
-                              Theme.of(context).scaffoldBackgroundColor.withOpacity(0),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                  if(!_atEnd)
-                    Positioned(
-                      top: 0,
-                      right: 0,
-                      height: 300,
-                      child: TextButton(
-                        child: Icon(Icons.keyboard_arrow_right, color: Colors.black,size: 36),
-                        onPressed: () {
-                          _moveListRight(true);
-                        },
-                      ),
-                    ),
-                ],
+                          if(!_atStart)
+                            Positioned(
+                              top: 0,
+                              left: 0,
+                              height: 500,
+                              width: 100,
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  gradient: LinearGradient(
+                                    begin: Alignment.centerLeft,
+                                    end: Alignment.centerRight,
+                                    stops: [0, 0.2],
+                                    colors: [
+                                      Theme.of(context).scaffoldBackgroundColor,
+                                      Theme.of(context).scaffoldBackgroundColor.withOpacity(0),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                          if(!_atStart)
+                            Positioned(
+                              top: 0,
+                              left: 0,
+                              height: 500,
+                              child: TextButton(
+                                child: Icon(Icons.keyboard_arrow_left, color: Colors.black,size: 36,),
+                                onPressed: () {
+                                  _moveListRight(false);
+                                },
+                              ),
+                            ),
+                          if(!_atEnd)
+                            Positioned(
+                              top: 0,
+                              right: 0,
+                              height: 500,
+                              width: 100,
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  gradient: LinearGradient(
+                                    begin: Alignment.centerRight,
+                                    end: Alignment.centerLeft,
+                                    stops: [0, 0.2],
+                                    colors: [
+                                      Theme.of(context).scaffoldBackgroundColor,
+                                      Theme.of(context).scaffoldBackgroundColor.withOpacity(0),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                          if(!_atEnd)
+                            Positioned(
+                              top: 0,
+                              right: 0,
+                              height: 500,
+                              child: TextButton(
+                                child: Icon(Icons.keyboard_arrow_right, color: Colors.black,size: 36),
+                                onPressed: () {
+                                  _moveListRight(true);
+                                },
+                              ),
+                            ),
+                        ],
+                      );
+                      break;
+                  }
+                  return Container();
+                }
               ),
+            ),
+            SizedBox(
+              height: 25,
             ),
           ],
     );

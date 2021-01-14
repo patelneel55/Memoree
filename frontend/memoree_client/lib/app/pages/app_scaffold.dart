@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:memoree_client/app/pages/landing.dart';
 import 'package:provider/provider.dart';
 
+import 'package:memoree_client/app/pages/landing.dart';
+import 'package:memoree_client/app/widgets/wip.dart';
 import 'package:memoree_client/app/models/constants.dart';
 import 'package:memoree_client/app/models/drawer_state.dart';
 import 'package:memoree_client/app/models/search_state.dart';
@@ -46,9 +47,7 @@ class AppScaffold extends StatelessWidget {
                             );
                             break;
                           case PageTitles.folders:
-                            return Container(
-                              child: Center(child: Text("Folder Tree goes here"))
-                            );
+                            return WIP();
                             break;
                           default:
                             return Container();
