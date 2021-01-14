@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:memoree_client/app/pages/landing.dart';
 import 'package:provider/provider.dart';
 
 import 'package:memoree_client/app/models/constants.dart';
@@ -33,7 +34,6 @@ class AppScaffold extends StatelessWidget {
                   AppDrawer(isMobile: isMobileLayout,isTablet: isTabletLayout,),
                 Container(
                   child: Expanded(
-                    // child: Container(child: Text(this._selectedPage))
                     child: Consumer2<SearchModel, DrawerModel>(
                       builder: (_, search, drawer, __) {
                         switch(drawer.state)
@@ -41,7 +41,7 @@ class AppScaffold extends StatelessWidget {
                           case PageTitles.videos:
                             return Container(
                               child: search.query == null ? 
-                                Center(child: Text("Carousel Page goes here")) :
+                                LandingPage() :
                                 VideoPage(search.query)
                             );
                             break;
