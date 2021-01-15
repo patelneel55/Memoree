@@ -204,6 +204,18 @@ function generateThumbnail(videoURL) {
 	});
 }
 
+async function emailExists(email) {
+	const record = await admin
+		.firestore()
+		.collection('memoree_whitelist')
+		.doc('authorized_emails')
+		.get();
+	
+	if(!record.exists)
+		return false;
+	console.log(record.data().emails.includes(email))
+	return record.data().emails.includes(email);
+}
 
 // The following functions are triggered when a new entity is added or
 // modified in Google Cloud Storage
@@ -235,7 +247,20 @@ exports.processJson = functions
 		await addSearchRecords(object)
 	})
 
-exports.search = functions.runWith(runtimeOpts).https.onCall((data, context) => {
+exports.search = functions.runWith(runtimeOpts).https.onCall(async (data, context) => {
+	if(!context.auth || !context.auth.token.email)
+		throw new functions.https.HttpsError(
+			'failed-precondition',
+			'The function must be called while authenticated',
+		);
+	
+	const isWhietlisted = await emailExists(context.auth.token.email);
+	if(!isWhietlisted)
+		throw new functions.https.HttpsError(
+			'failed-precondition',
+			'User ${context.auth.token.email} does not have access to this server.\nPlease contact your admin.'
+		);
+
 	return new Promise(async (resolve, reject) => {
 		let queryParams = {
 			"query": data.q,
@@ -254,7 +279,20 @@ exports.search = functions.runWith(runtimeOpts).https.onCall((data, context) => 
 	});
 });
 
-exports.generate_thumbnail = functions.runWith(runtimeOpts).https.onCall((data, res) => {
+exports.generateThumbnail = functions.runWith(runtimeOpts).https.onCall(async (data, context) => {
+	if(!context.auth || !context.auth.token.email)
+		throw new functions.https.HttpsError(
+			'failed-precondition',
+			'The function must be called while authenticated',
+		);
+	
+	const isWhietlisted = await emailExists(context.auth.token.email);
+	if(!isWhietlisted)
+		throw new functions.https.HttpsError(
+			'failed-precondition',
+			'User ${context.auth.token.email} does not have access to this server.\nPlease contact your admin.'
+		);
+
 	return new Promise(async (resolve, reject) => {
 		try {
 			let imageData = await generateThumbnail(data.video_url);
@@ -263,5 +301,18 @@ exports.generate_thumbnail = functions.runWith(runtimeOpts).https.onCall((data, 
 			console.error(err);
 			reject(new functions.https.HttpsError(500, "Unexpected error occured.", err));
 		}
+	});
+});
+
+exports.checkWhitelist = functions.runWith(runtimeOpts).https.onCall((data, context) => {
+	if(!context.auth || !context.auth.token.email)
+		throw new functions.https.HttpsError(
+			'failed-precondition',
+			'The function must be called while authenticated',
+		);
+
+	return new Promise(async (resolve, reject) => {
+		let isWhitelisted = await emailExists(context.auth.token.email);
+		resolve(isWhitelisted);
 	});
 });
