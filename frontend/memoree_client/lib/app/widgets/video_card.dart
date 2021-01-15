@@ -58,6 +58,16 @@ class _VideoCardState extends State<VideoCard> {
       );
   }
 
+  Color _getConfidenceColor(confidence) {
+    if(confidence >= 0.8)
+      return Colors.green;
+    else if(confidence > 0.51 && confidence < 0.8)
+      return Colors.orange;
+    else if(confidence < 0.5)
+      return Colors.redAccent;
+    else return Colors.black;
+  }
+
   @override
   Widget build(BuildContext context) {
     final VideoData _videoData = VideoDataProvider.of(context).videoData;
@@ -125,7 +135,10 @@ class _VideoCardState extends State<VideoCard> {
                         child: Text(
                           NumberFormat("###.#%").format(_videoData.data["confidence"]),
                           textAlign: TextAlign.right,
-                          style: TextStyle(fontWeight: FontWeight.w500),
+                          style: TextStyle(
+                            fontWeight: FontWeight.w500,
+                            color: _getConfidenceColor(_videoData.data["confidence"]), 
+                          ),
                         )
                       )
                     ]

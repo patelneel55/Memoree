@@ -33,10 +33,10 @@ class VideoPage extends StatelessWidget {
                           flex: 9,
                           child: Text("Results for: " + this.searchQuery, textScaleFactor: 1.5, style: TextStyle(fontWeight: FontWeight.w500),),
                         ),
-                        Expanded(
-                          flex: 2,
-                          child: Text("98%", textAlign: TextAlign.right,)
-                        )
+                        // Expanded(
+                        //   flex: 2,
+                        //   child: Text("98%", textAlign: TextAlign.right,)
+                        // )
                       ],
                     ),
                   ),
