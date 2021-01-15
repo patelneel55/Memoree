@@ -88,14 +88,14 @@ class DrawerItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return ClipRRect(
       borderRadius: BorderRadius.only(
-        topRight: Radius.circular(50),
-        bottomRight: Radius.circular(50),
+        topRight: Radius.circular(25),
+        bottomRight: Radius.circular(25),
       ),
       child: ListTile(
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.only(
-            topRight: Radius.circular(50),
-            bottomRight: Radius.circular(50)
+            topRight: Radius.circular(25),
+            bottomRight: Radius.circular(25)
           ),
         ),
         selected: this.selected,
