@@ -38,23 +38,6 @@ class _CarouselState extends State<Carousel> {
     _scrollController.addListener(_scrollListener);
 
     _listView = null;
-    
-    // ListView.builder(
-    //   shrinkWrap: true,
-    //   scrollDirection: Axis.horizontal,
-    //   itemCount: 50,
-    //   controller: _scrollController,
-    //   itemBuilder: (context, index) {
-    //     return Container(
-    //       decoration: BoxDecoration(
-    //         color: [Colors.red, Colors.green, Colors.yellow][Random().nextInt(3)]
-    //       ),
-    //       height: 100,
-    //       width: 100,
-    //       child: Center(child: Text("$index")),
-    //     );
-    //   },
-    // );
   }
 
   void _scrollListener() {
@@ -91,18 +74,19 @@ class _CarouselState extends State<Carousel> {
   @override
   Widget build(BuildContext context) {
     return Column(
-          mainAxisSize: MainAxisSize.min,
-          mainAxisAlignment: MainAxisAlignment.start,
+          // mainAxisSize: MainAxisSize.min,
+          // mainAxisAlignment: MainAxisAlignment.start,
           children: <Widget>[
             Align(
               alignment: Alignment.centerLeft,
               child: Padding(
-                padding: EdgeInsets.only(top: 15.0, bottom: 15.0),
-                child: Text(widget.query.capitalize(), textAlign: TextAlign.left,)
+                padding: EdgeInsets.only(top: 5.0),
+                child: Text(widget.query.capitalize(), textScaleFactor: 1.25, textAlign: TextAlign.left,)
               ) 
             ),
-            Container(
-              height: 500,
+            SizedBox(height: 5.0),
+            ConstrainedBox(
+              constraints: BoxConstraints(maxHeight: 300, minHeight: 200),
               child: FutureBuilder(
                 future: _memoizer.runOnce(() async { return SearchService.fetchSearchResults(widget.query, perPage: 10); }),
                 builder: (context, snapshot) {
@@ -117,14 +101,20 @@ class _CarouselState extends State<Carousel> {
                         children: [
                           Positioned.fill(
                             child: _listView ??= ListView.builder(
-                              shrinkWrap: true,
                               scrollDirection: Axis.horizontal,
                               itemCount: snapshot.data != null ? snapshot.data.length : 0,
                               controller: _scrollController,
                               itemBuilder: (context, index) {
-                                return VideoDataProvider(
-                                  child: VideoCard(),
-                                  videoData: snapshot.data[index]
+                                // _atEnd = _scrollController.position.maxScrollExtent <= 0;
+                                return Padding(
+                                  padding: const EdgeInsets.only(right: 20.0),
+                                  child: AspectRatio(
+                                    aspectRatio: 1.1,
+                                    child: VideoDataProvider(
+                                      child: VideoCard(),
+                                      videoData: snapshot.data[index],
+                                    ),
+                                  ),
                                 );
                               },
                             ),
@@ -133,7 +123,7 @@ class _CarouselState extends State<Carousel> {
                             Positioned(
                               top: 0,
                               left: 0,
-                              height: 500,
+                              height: 350,
                               width: 100,
                               child: Container(
                                 decoration: BoxDecoration(
@@ -153,7 +143,7 @@ class _CarouselState extends State<Carousel> {
                             Positioned(
                               top: 0,
                               left: 0,
-                              height: 500,
+                              height: 350,
                               child: TextButton(
                                 child: Icon(Icons.keyboard_arrow_left, color: Colors.black,size: 36,),
                                 onPressed: () {
@@ -165,7 +155,7 @@ class _CarouselState extends State<Carousel> {
                             Positioned(
                               top: 0,
                               right: 0,
-                              height: 500,
+                              height: 350,
                               width: 100,
                               child: Container(
                                 decoration: BoxDecoration(
@@ -185,7 +175,7 @@ class _CarouselState extends State<Carousel> {
                             Positioned(
                               top: 0,
                               right: 0,
-                              height: 500,
+                              height: 350,
                               child: TextButton(
                                 child: Icon(Icons.keyboard_arrow_right, color: Colors.black,size: 36),
                                 onPressed: () {
