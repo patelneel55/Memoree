@@ -10,6 +10,19 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
+  String _errorMessage;
+
+  @override
+  void initState() {
+    _errorMessage = null;
+  }
+
+  void _showError(err) {
+    setState(() {
+      _errorMessage = err;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -35,6 +48,8 @@ class _LoginPageState extends State<LoginPage> {
                           },
                         ),);
                       }
+                    }).catchError((error) {
+                      _showError(error);
                     });
                   },
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(40)),
@@ -55,6 +70,10 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                   ),
                 ),
+                if(_errorMessage != null)
+                  SizedBox(height: 10,),
+                if(_errorMessage != null)
+                  Text(_errorMessage, style: TextStyle(color: Colors.red),),
               ]
             ),
           ),

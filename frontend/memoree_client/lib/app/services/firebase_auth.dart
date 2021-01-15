@@ -1,6 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart' as auth;
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:memoree_client/app/models/constants.dart';
 import 'package:memoree_client/app/models/user.dart';
+import 'package:memoree_client/app/services/search.dart';
 
 class FirebaseAuthService {
   final auth.FirebaseAuth _firebaseAuth;
@@ -34,7 +36,18 @@ class FirebaseAuthService {
       idToken: googleAuth.idToken,
     );
     final authResult = await _firebaseAuth.signInWithCredential(credential);
-    return _userFromFirebase(authResult.user);
+    User signedIn = _userFromFirebase(authResult.user);
+
+    // Check if user is allowed to access the server
+    final isAllowed = await SearchService.isWhitelisted(signedIn.email);
+    if(!isAllowed)
+    {
+      await _googleSignIn.disconnect();
+      await _firebaseAuth.signOut();
+      throw(signedIn.email + PageErrors.no_access);
+    }
+
+    return signedIn;
   }
 
   Future<void> signOut() async {

@@ -26,7 +26,7 @@ class SearchService {
 
   static Future<Image> fetchThumbnail(String videoUrl) async
   {
-    final HttpsCallable funcCallable = FirebaseFunctions.instance.httpsCallable("generate_thumbnail");
+    final HttpsCallable funcCallable = FirebaseFunctions.instance.httpsCallable("generateThumbnail");
 
     try {
       final HttpsCallableResult result = await funcCallable.call(<String, dynamic>{'video_url': videoUrl});
@@ -37,6 +37,20 @@ class SearchService {
       print("fetchThumbnail");
       print(err);
       return null;
+    }
+  }
+
+  static Future<bool> isWhitelisted(String email) async
+  {
+    final HttpsCallable funcCallable = FirebaseFunctions.instance.httpsCallable("checkWhitelist");
+
+    try {
+      final HttpsCallableResult result = await funcCallable.call(<String, dynamic>{});
+      return result.data;
+    }
+    catch(err)
+    {
+      return false;
     }
   }
 }

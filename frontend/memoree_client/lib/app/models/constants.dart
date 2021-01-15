@@ -15,4 +15,8 @@ class ActionNames {
   static const String search = "Search";
 }
 
+class PageErrors {
+  static const String no_access = " does not have access to this server.\nPlease contact your admin for more details.";
+}
+
 const List<String> PRESET_QUERIES = ["Birthday", "weddings", "waterfalls", "Mountains"];
