@@ -1,73 +1,35 @@
-import 'dart:convert';
-import 'dart:io';
-import 'dart:math';
+import 'package:flutter/material.dart';
 
-import 'package:cloud_functions/cloud_functions.dart';
-import 'package:path/path.dart' as path;
-import 'package:path_provider/path_provider.dart';
+import 'package:memoree_client/app/services/search.dart';
 
 class VideoData {
   final String filename;
   final String filePath;
   final String videoUrl;
   final DateTime timestamp;
-  final List<dynamic> data;
-  String thumbnailPath;
+  final Map<String, dynamic> data;
+  Image thumbnail;
 
-  VideoData({this.filename, this.filePath, this.videoUrl, int timestamp, this.data}) : this.timestamp = timestamp != null ? DateTime.fromMillisecondsSinceEpoch(timestamp) : null, this.thumbnailPath = "";
+  VideoData({this.filename, this.filePath, this.videoUrl, int timestamp, this.data}) 
+    : this.timestamp = timestamp != null ? DateTime.fromMillisecondsSinceEpoch(timestamp)
+    : null, this.thumbnail = null;
 
   factory VideoData.fromJson(Map<String, dynamic> json) {
 
+    List<String> fileComponents = json['file_name'].split('/');
+
     return VideoData(
-      filename: json['file_name'].split('/').last,
-      filePath: json['file_name'].split('/').removeLast().join('/'),
+      filename: fileComponents.removeLast(),
+      filePath: fileComponents.join('/'),
       videoUrl: json['videoURL'],
       timestamp: json['timestamp'],
       data: json['document']
     );
   }
 
-  Future<String> getThumbnail() async
+  Future<Image> getThumbnail() async  
   {
-    if(this.thumbnailPath.isNotEmpty)
-      return this.thumbnailPath;
-    
-    final HttpsCallable funcCallable = FirebaseFunctions.instance.httpsCallable("generate_thumbnail");
-
-    try {
-      final HttpsCallableResult result = await funcCallable.call(<String, dynamic>{'video_url': this.videoUrl});
-      File thumb = File.fromRawPath(base64Decode(result.data));
-
-      String filePath = "";
-      do {
-        String fileName = String.fromCharCodes(List.generate(7, (index) => Random.secure().nextInt(33) + 89)) + ".png";
-        filePath = path.join((await getApplicationDocumentsDirectory()).path, fileName);
-      } while(await File(filePath).exists());
-
-      thumb.copySync(filePath);
-      this.thumbnailPath = filePath;
-      return this.thumbnailPath;
-    }
-    catch(err)
-    {
-      print(err);
-      return null;
-    }
-  }
-}
-
-Future<List<VideoData>> fetchSearchResults(String query, {int page : 1}) async
-{
-  final HttpsCallable funcCallable = FirebaseFunctions.instance.httpsCallable("search");
-
-  try {
-    final HttpsCallableResult result = await funcCallable.call(<String, dynamic>{'q': query, 'page': page});
-    return result.data.map<VideoData>((obj) {
-      return VideoData.fromJson(obj);
-    }).toList();
-  }
-  catch(err) {
-    print(err);
-    return null;
+    this.thumbnail ??= await SearchService.fetchThumbnail(this.videoUrl);
+    return this.thumbnail;
   }
 }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import 'package:memoree_client/app/services/firebase_auth.dart';
 import 'package:memoree_client/app/pages/app_scaffold.dart';
 import 'package:memoree_client/app/models/constants.dart';
@@ -30,7 +31,7 @@ class _LoginPageState extends State<LoginPage> {
                         Navigator.of(context).pop();
                         Navigator.of(context).push(MaterialPageRoute(
                           builder: (context) {
-                            return AppScaffold(page: 'videos');
+                            return AppScaffold();
                           },
                         ),);
                       }

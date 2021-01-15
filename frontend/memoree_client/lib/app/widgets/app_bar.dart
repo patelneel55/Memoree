@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:memoree_client/app/services/firebase_auth.dart';
 import 'package:memoree_client/app/models/constants.dart';
 import 'package:memoree_client/app/widgets/account_info.dart';
-import 'package:memoree_client/search.dart';
+import 'package:memoree_client/app/widgets/search_bar.dart';
 
 class CustomAppBar extends StatefulWidget with PreferredSizeWidget {
   final bool isMobile, isTablet;
@@ -15,7 +15,7 @@ class CustomAppBar extends StatefulWidget with PreferredSizeWidget {
   _CustomAppBarState createState() => _CustomAppBarState();
 
   @override
-  Size get preferredSize => Size.fromHeight(kToolbarHeight);
+  Size get preferredSize => Size.fromHeight(65);
 }
 
 class _CustomAppBarState extends State<CustomAppBar> {
@@ -29,7 +29,7 @@ class _CustomAppBarState extends State<CustomAppBar> {
         centerTitle: true,
         title: Row(
           children: <Widget>[
-            Text(PageTitles.appName, style: TextStyle(fontWeight: FontWeight.w400, fontFamily: "ProductSans")),
+            Text(PageTitles.appName, style: TextStyle(fontWeight: FontWeight.w500)),
             SizedBox(width: 8,),
             if (!widget.isTablet)
               Flexible(

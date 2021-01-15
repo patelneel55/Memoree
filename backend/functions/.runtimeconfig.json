@@ -1,0 +1,14 @@
+{
+  "memoree": {
+    "search_port": "1491",
+    "parsed_json_bucket": "parsed_json_archive",
+    "algolia_appid": "8GAF49D2GO",
+    "json_bucket": "video_json_archive",
+    "algolia_index": "videos",
+    "search_index": "videos",
+    "search_host": "35.222.10.51",
+    "algolia_admin_key": "c595799e733fb372fb8902d19c3ab389",
+    "search_apikey": "tls98Gaqf2Cc19l2j02V2Zj4fAgQoNoQH5IhDT9KUOR6jF8z",
+    "video_bucket": "memoree_video_archive"
+  }
+}

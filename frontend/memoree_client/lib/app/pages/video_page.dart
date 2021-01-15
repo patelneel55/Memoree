@@ -1,12 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:memoree_client/app/services/search.dart';
 
 import 'package:memoree_client/app/widgets/grid_results.dart';
 
 class VideoPage extends StatelessWidget {
+  final String searchQuery;
+
+  VideoPage(this.searchQuery);
+
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-      future: Future.delayed(Duration(seconds: 3)),
+      future: SearchService.fetchSearchResults(this.searchQuery),
       builder: (context, snapshot) {
         switch(snapshot.connectionState) {
           case ConnectionState.none:
@@ -26,12 +31,12 @@ class VideoPage extends StatelessWidget {
                       children: <Widget>[
                         Expanded(
                           flex: 9,
-                          child: Text("Results for: ", textScaleFactor: 1.5, style: TextStyle(fontWeight: FontWeight.w500),),
+                          child: Text("Results for: " + this.searchQuery, textScaleFactor: 1.5, style: TextStyle(fontWeight: FontWeight.w500),),
                         ),
-                        Expanded(
-                          flex: 2,
-                          child: Text("98%", textAlign: TextAlign.right,)
-                        )
+                        // Expanded(
+                        //   flex: 2,
+                        //   child: Text("98%", textAlign: TextAlign.right,)
+                        // )
                       ],
                     ),
                   ),
@@ -40,7 +45,9 @@ class VideoPage extends StatelessWidget {
                     child: Divider(height: 1, thickness: 1.5,)
                   ),
                   Expanded(
-                    child: ContentGrid()
+                    child: ContentGrid(
+                      videoDataList: snapshot.data
+                    ),
                   ),
                 ],
               )

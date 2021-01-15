@@ -15,4 +15,4 @@ class ActionNames {
   static const String search = "Search";
 }
 
-const List<String> PRESET_QUERIES = ["Father's Day", "Birthday", "Baby"];
+const List<String> PRESET_QUERIES = ["Birthday", "weddings", "waterfalls", "Mountains"];

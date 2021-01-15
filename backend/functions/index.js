@@ -28,9 +28,9 @@ const videoIntel = require('@google-cloud/video-intelligence');
 const fs = require('fs');
 const path = require('path');
 const os = require('os');
+const spawn = require('child_process').spawn;
 
-const ffmpeg = require('fluent-ffmpeg');
-ffmpeg.setFfmpegPath(require('@ffmpeg-installer/ffmpeg').path);
+const ffmpegInstallation = require('@ffmpeg-installer/ffmpeg');
 
 const utils = require('./utils.js');
 const algolia = require('./algolia.js');
@@ -143,14 +143,14 @@ async function makeSearchRequest(queryParams)
 			functions.config().memoree.search_apikey,
 			functions.config().memoree.search_index
 		);
-		if(searchResult.hits.length == 0)
+		if(searchResult.grouped_hits.length == 0)
 			break;
 
-		let results = searchResult.hits.map(obj => {
+		let results = searchResult.grouped_hits.map(obj => {
 			return {
-				"file_name": obj.document.file_name,
-				"confidence": obj.document.confidence,
-				"data": obj.document
+				"file_name": obj.hits[0].document.file_name,
+				"confidence": obj.hits[0].document.confidence,
+				"document": obj.hits[0].document
 			}
 		});
 
@@ -172,6 +172,7 @@ async function makeSearchRequest(queryParams)
 
 		queryParams.page++;
 	}
+	tailoredResults = tailoredResults.slice(0, request_per_page);
 
 	return tailoredResults;
 }
@@ -180,26 +181,27 @@ function generateThumbnail(videoURL) {
 
     do {
         var fileName = Math.random().toString(36).substring(7);
-        var filePath = path.join(os.tmpdir(), fileName);
-    } while(fs.existsSync(filePath + ".png"));
+        var filePath = path.join(os.tmpdir(), fileName) + ".bmp";
+	} while(fs.existsSync(filePath));
 
-    return new Promise((resolve, reject) => {
-        ffmpeg(videoURL)
-        .screenshots({
-            folder: os.tmpdir(),
-            filename: fileName,
-            timemarks: [(Math.floor(Math.random() * 15) + 1) + "%"],
-			size: "500x?"
-        })
-        .on('end', () => {
-            let dataURL = fs.readFileSync(filePath + ".png", 'base64');
-            fs.unlinkSync(filePath + ".png");
-            resolve(dataURL);
-        })
-        .on('error', (err) => {
-            reject(err);
-        })
-    });
+	return new Promise((resolve, reject) => {
+		let cmd = ffmpegInstallation.path;
+		let args = [
+			'-y',
+			'-i', videoURL,
+			'-frames:v', '1',
+			filePath
+		]
+		let proc = spawn(cmd, args);
+		proc.on('close', function(code) {
+			if(code != 0)
+				return reject("FFMPEG error occured.");
+
+			let dataURL = fs.readFileSync(filePath, 'base64');
+			fs.unlinkSync(filePath);
+			return resolve(dataURL);
+		});
+	});
 }
 
 
@@ -233,22 +235,33 @@ exports.processJson = functions
 		await addSearchRecords(object)
 	})
 
-exports.search = functions.runWith(runtimeOpts).https.onRequest(async (req, res) => {
-	let queryParams = {
-		"query": req.query.q,
-		"sortType": req.query.sort || "relevant",
-		"page": req.query.page || 1,
-		"per_page": req.query.per_page || 25,
-	}
-	let resData = await makeSearchRequest(queryParams);
+exports.search = functions.runWith(runtimeOpts).https.onCall((data, context) => {
+	return new Promise(async (resolve, reject) => {
+		let queryParams = {
+			"query": data.q,
+			"sortType": data.sort || "relevant",
+			"page": data.page || 1,
+			"per_page": data.per_page || 25,
+		}
 
-	res.send(resData);
+		try{
+			let resData = await makeSearchRequest(queryParams);
+			resolve(resData);
+		}catch(err){
+			console.error(err);
+			reject(new functions.https.HttpsError(500, "Unexpected error occured.", err));
+		}
+	});
 });
 
-exports.generate_thumbnail = functions.runWith(runtimeOpts).https.onRequest(async (req, res) => {
-	let videoURL = req.query.video_url;
-
-	let imageData = await generateThumbnail(videoURL);
-
-	return res.send(imageData);
+exports.generate_thumbnail = functions.runWith(runtimeOpts).https.onCall((data, res) => {
+	return new Promise(async (resolve, reject) => {
+		try {
+			let imageData = await generateThumbnail(data.video_url);
+			resolve(imageData);
+		}catch(err){
+			console.error(err);
+			reject(new functions.https.HttpsError(500, "Unexpected error occured.", err));
+		}
+	});
 });

@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+  <html>
+      <head>
+          <style>
+              html, body {
+                  padding: 0;
+                  margin: 0;
+              }
+              html {
+                  height: 100%;
+              }
+              body {
+                  min-height: 100%;
+                  display: flex;
+                  flex-direction: column;
+                  justify-content: center;
+                  align-items: center;
+                  align-content: center;
+              }
+          </style>
+
+          <!-- Video.js Player -->
+          <link href="https://vjs.zencdn.net/7.10.2/video-js.css" rel="stylesheet"/>
+          <link href="https://unpkg.com/@videojs/themes@1/dist/forest/index.css" rel="stylesheet"/>
+          <script src="https://vjs.zencdn.net/7.10.2/video.min.js"></script>
+
+          <!-- JQuery -->
+          <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+      </head>
+      <body>
+          <div id="player_container">
+              <video id="video" class="video-js vjs-theme-forest" preload="auto" width="640" height="264" disablePictureInPicture controls></video>
+          </div>
+
+          <script>
+            let videoPath = "https://storage.googleapis.com/memoree_video_archive/Photo%20Gallery/2019/phone%20dump/S9%20Plus/20180414_211332.mp4?X-Goog-Algorithm=GOOG4-RSA-SHA256&X-Goog-Credential=iron-flash-284000%40appspot.gserviceaccount.com%2F20210107%2Fauto%2Fstorage%2Fgoog4_request&X-Goog-Date=20210107T041103Z&X-Goog-Expires=86400&X-Goog-SignedHeaders=host&X-Goog-Signature=82c382e03bb13a87ed0d20f702eafe4dd06b2714191d182f73793e83cc02ad9a8532d0c588331aaaa723163fe9834467b9f09c59325cf29fe0d525bfa62c37f491c29633a2a19cef8677ae80c0a026d231d4576bf2512bbf43c0b370daba6b9e3bbbaf7220b20a40f1c690aa1851a4cfdd04bc786ccc795681ea800be218c191d42600748d01c5c30ea02002ac0df9a599787384f35a58fc816aaf63cdf0b4f203fb6e8230ad9b80fa40436dc204ea9b66e4578bcaf5c24b7b86519b91268e645d7f7c0e2be08eab91a5e253e511090370d3373eed5342e59a26a7c519c200c6d929eafd0b76c20e04ff3c2e28dd82c11d0cafb4b38a6c328ff68a4caa847faf";
+            let streamServer = "localhost";
+            let streamPort = "8024";
+            let path = encodeURIComponent(videoPath);
+
+            var video = videojs("video");
+            video.src({
+                src: "http://"+ streamServer + ":" + streamPort + "/media/" + path,
+                type: 'video/mp4'
+            });
+
+            // Get the dureation of the movie
+            $.getJSON("http://"+ streamServer + ":" + streamPort + "/duration/" + path, (data) => {
+                video.theDuration = data.duration / 1000;
+            });
+
+            // hack duration
+            video.duration = () => video.theDuration;
+            video.start = 0;
+
+            // The original code for "currentTime"
+            video.oldCurrentTime = function currentTime(seconds) {
+              if (typeof seconds !== 'undefined') {
+                if (seconds < 0)
+                  seconds = 0;
+
+                this.techCall_('setCurrentTime', seconds);
+                return;
+              }
+              this.cache_.currentTime = this.techGet_('currentTime') || 0;
+              return this.cache_.currentTime;
+            }
+
+            // Our modified currentTime
+            video.currentTime = (time) => {
+              if( time == undefined )
+                return video.oldCurrentTime() + video.start;
+
+              video.start = time;
+              video.oldCurrentTime(0);
+              video.src({
+                src: "http://" + streamServer + ":" + streamPort + "/media/" + path + "?start=" + time,
+                type: 'video/mp4'
+              });
+              video.play();
+              return this;
+            };
+          </script>
+      </body>
+  </html>
