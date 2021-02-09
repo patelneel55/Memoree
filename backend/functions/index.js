@@ -93,6 +93,12 @@ async function runVideoAnalyzer(bucketObject) {
 
 }
 
+/**
+ * Parses the data geenrated from the GCloud Video Intelligence API
+ * and adds it to a search server for indexing 
+ * 
+ * @param {*} bucketObject The json file generated from the Video Intelligence API
+ */
 async function addSearchRecords(bucketObject) {
 	const tempFilePath = path.join(os.tmpdir(), bucketObject.name.split(/(?:\.([^.]+))?$/)[0] + '_' + bucketObject.name.split(/(?:\.([^.]+))?$/)[1] + '.json');
 
@@ -118,16 +124,30 @@ async function addSearchRecords(bucketObject) {
 
 	// Upload parsed data to search database using helper functions
 	parseFunc.forEach((func) => {
-		typesense.save(
-			func(json.annotation_results),
-			functions.config().memoree.search_host,
-			functions.config().memoree.search_port,
-			functions.config().memoree.search_apikey,
-			functions.config().memoree.search_index
-		)
+		if(functions.config().memoree.typesense.active)
+			typesense.save(
+				func(json.annotation_results),
+				functions.config().memoree.typesense.host,
+				functions.config().memoree.typesense.port,
+				functions.config().memoree.typesense.api_key,
+				functions.config().memoree.typesense.index
+			)
+		else if(functions.config().memoree.algolia.active)
+			algolia.save(
+				func(json.annotation_results),
+				functions.config().memoree.algolia.app_id,
+				functions.config().memoree.algolia.admin_key,
+				functions.config().memoree.algolia.index
+			)
 	})
 }
 
+/**
+ * Resolve a search request make to the respective search index
+ * server
+ * 
+ * @param {*} queryParams Search params to customize request
+ */
 async function makeSearchRequest(queryParams)
 {
 	let tailoredResults = [];
@@ -138,10 +158,10 @@ async function makeSearchRequest(queryParams)
 	{
 		let searchResult = await typesense.search(
 			queryParams,
-			functions.config().memoree.search_host,
-			functions.config().memoree.search_port,
-			functions.config().memoree.search_apikey,
-			functions.config().memoree.search_index
+			functions.config().memoree.typesense.host,
+			functions.config().memoree.typesense.port,
+			functions.config().memoree.typesense.api_key,
+			functions.config().memoree.typesense.index
 		);
 		if(searchResult.grouped_hits.length == 0)
 			break;
@@ -177,8 +197,15 @@ async function makeSearchRequest(queryParams)
 	return tailoredResults;
 }
 
+/**
+ * Generate a base64 data URL representing an image from a video
+ * source using ffmpeg
+ *  
+ * @param {*} videoURL Video source url used to extract thumbnail
+ */
 function generateThumbnail(videoURL) {
 
+	// Generate unique random file name
     do {
         var fileName = Math.random().toString(36).substring(7);
         var filePath = path.join(os.tmpdir(), fileName) + ".bmp";
@@ -204,6 +231,12 @@ function generateThumbnail(videoURL) {
 	});
 }
 
+/**
+ * Authorize access to user based on whitelist
+ * under Firebase Firestore
+ * 
+ * @param {*} email Google email of user
+ */
 async function emailExists(email) {
 	const record = await admin
 		.firestore()
@@ -217,8 +250,9 @@ async function emailExists(email) {
 	return record.data().emails.includes(email);
 }
 
-// The following functions are triggered when a new entity is added or
-// modified in Google Cloud Storage
+// The following functions are triggered externally 
+// when a new entity is added in Google Cloud Storage or
+// a request is made
 
 const runtimeOpts = {
 	timeoutSeconds: 90,
