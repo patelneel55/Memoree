@@ -50,3 +50,15 @@ exports.save = (records, appId, apiKey, targetIndex) => {
     // Save records to Algolia
     index.saveObjects(records)
 }
+
+exports.search = (queryParams, appId, apiKey, targetIndex) => {
+    const algoliaClient = algoliasearch(appId, apiKey)
+    const index = algoliaClient.initIndex(targetIndex)
+
+    return new Promise((resolve, reject) => {
+        index.search(queryParams.query, {
+            hitsPerPage: queryParams.page * queryParams.per_page
+        }).then(({hits}) => resolve(res))
+        .catch(err => reject(err));
+    })
+}

@@ -144,55 +144,92 @@ async function addSearchRecords(bucketObject) {
 
 /**
  * Resolve a search request make to the respective search index
- * server
+ * server (Algolia or Typesense)
  * 
  * @param {*} queryParams Search params to customize request
  */
 async function makeSearchRequest(queryParams)
 {
-	let tailoredResults = [];
-	let request_per_page = queryParams.per_page * queryParams.page;
-	queryParams.page = 1;
-
-	while(tailoredResults.length < request_per_page)
+	let tailoredResults = []
+	if(functions.config().memoree.typesense.active)
 	{
-		let searchResult = await typesense.search(
+		let request_per_page = queryParams.per_page * queryParams.page;
+		queryParams.page = 1;
+	
+		while(tailoredResults.length < request_per_page)
+		{
+			let searchResult = await typesense.search(
+				queryParams,
+				functions.config().memoree.typesense.host,
+				functions.config().memoree.typesense.port,
+				functions.config().memoree.typesense.api_key,
+				functions.config().memoree.typesense.index
+			);
+			if(searchResult.grouped_hits.length == 0)
+				break;
+	
+			let results = searchResult.grouped_hits.map(obj => {
+				return {
+					"file_name": obj.hits[0].document.file_name,
+					"confidence": obj.hits[0].document.confidence,
+					"document": obj.hits[0].document
+				}
+			});
+	
+			for (const item of results)
+			{
+				if(tailoredResults.findIndex((item1) => item1.file_name == item.file_name) == -1)
+				{
+					const file_blob = admin.storage().bucket(functions.config().memoree.video_bucket).file(item.file_name.replace(/^.+?[\/]/, ""));
+					const [url] = await file_blob.getSignedUrl({
+						version: 'v4',
+						action: 'read',
+						expires: Date.now() + (24 * 60 ** 2 * 1000)
+					});
+	
+					item['videoURL'] = url;
+					tailoredResults.push(item);
+				}
+			}
+	
+			queryParams.page++;
+		}
+		tailoredResults = tailoredResults.slice(0, request_per_page);
+	}
+	else if(functions.config().memoree.algolia.active)
+	{
+		let searchResult = await algolia.search(
 			queryParams,
-			functions.config().memoree.typesense.host,
-			functions.config().memoree.typesense.port,
-			functions.config().memoree.typesense.api_key,
-			functions.config().memoree.typesense.index
-		);
-		if(searchResult.grouped_hits.length == 0)
-			break;
+			functions.config().memoree.algolia.app_id,
+			functions.config().memoree.algolia.api_key,
+			functions.config().memoree.algolia.index
+		)
 
-		let results = searchResult.grouped_hits.map(obj => {
+		let results = searchResult.map(obj => {
+			Object.keys(obj).forEach((key) => {
+				if(["_highlightResult", "_snippetResult", "_rankingInfo", "_distinctSeqID"].includes(key))
+					delete obj[key]
+			})
 			return {
-				"file_name": obj.hits[0].document.file_name,
-				"confidence": obj.hits[0].document.confidence,
-				"document": obj.hits[0].document
+				"file_name": obj.file_name,
+				"confidence": obj.confidence,
+				"document": obj
 			}
 		});
 
-		for (const item of results)
+		for(const item of results)
 		{
-			if(tailoredResults.findIndex((item1) => item1.file_name == item.file_name) == -1)
-			{
-				const file_blob = admin.storage().bucket(functions.config().memoree.video_bucket).file(item.file_name.replace(/^.+?[\/]/, ""));
-				const [url] = await file_blob.getSignedUrl({
-					version: 'v4',
-					action: 'read',
-					expires: Date.now() + (24 * 60 ** 2 * 1000)
-				});
+			const file_blob = admin.storage().bucket(functions.config().memoree.video_bucket).file(item.file_name.replace(/^.+?[\/]/, ""));
+			const [url] = await file_blob.getSignedUrl({
+				version: 'v4',
+				action: 'read',
+				expires: Date.now() + (24 * 60 ** 2 * 1000)
+			});
 
-				item['videoURL'] = url;
-				tailoredResults.push(item);
-			}
+			item['videoURL'] = url;
+			tailoredResults.push(item);
 		}
-
-		queryParams.page++;
 	}
-	tailoredResults = tailoredResults.slice(0, request_per_page);
 
 	return tailoredResults;
 }
@@ -288,8 +325,8 @@ exports.search = functions.runWith(runtimeOpts).https.onCall(async (data, contex
 			'The function must be called while authenticated',
 		);
 	
-	const isWhietlisted = await emailExists(context.auth.token.email);
-	if(!isWhietlisted)
+	const isWhitelisted = await emailExists(context.auth.token.email);
+	if(!isWhitelisted)
 		throw new functions.https.HttpsError(
 			'failed-precondition',
 			'User ${context.auth.token.email} does not have access to this server.\nPlease contact your admin.'
@@ -320,8 +357,8 @@ exports.generateThumbnail = functions.runWith(runtimeOpts).https.onCall(async (d
 			'The function must be called while authenticated',
 		);
 	
-	const isWhietlisted = await emailExists(context.auth.token.email);
-	if(!isWhietlisted)
+	const isWhitelisted = await emailExists(context.auth.token.email);
+	if(!isWhitelisted)
 		throw new functions.https.HttpsError(
 			'failed-precondition',
 			'User ${context.auth.token.email} does not have access to this server.\nPlease contact your admin.'
