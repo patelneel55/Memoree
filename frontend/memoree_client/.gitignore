@@ -47,3 +47,5 @@ app.*.map.json
 
 **secrets**
 .vscode/
+
+**.env**

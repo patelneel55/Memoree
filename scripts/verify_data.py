@@ -17,14 +17,14 @@ import argparse
 # Program argument parser
 arg_parser = argparse.ArgumentParser(description='Bulk upload all video files under the provided path to GCloud buckets using gsutil.')
 arg_parser.add_argument("-i", "--input_path", help="Input path of all the video files.", required=True)
-arg_parser.add_argument("-m", "--metadata", help="Path to metadata file", required=True)
+arg_parser.add_argument("-m", "--metadata", help="Path to metadata file")
 arg_parser.add_argument("-v", "--video_bucket", help="GCloud URL to video bucket", required=True)
 arg_parser.add_argument("-j", "--json_bucket", help="GCloud URL to json bucket", required=True)
 args = arg_parser.parse_args()
 
 
 prefix_path = os.path.abspath(args.input_path)
-metadata_file = os.path.abspath(args.metadata)
+metadata_file = os.path.abspath(args.metadata || os.path.join(os.path.dirname(__file__), "uploaded_files.json"))
 gcloud_video_bucket = args.video_bucket
 gcloud_json_bucket = args.json_bucket
 print()

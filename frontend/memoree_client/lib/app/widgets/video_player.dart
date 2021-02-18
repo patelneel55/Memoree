@@ -1,6 +1,8 @@
 import 'package:easy_web_view/easy_web_view.dart';
 import 'package:flutter/material.dart';
 import 'package:sprintf/sprintf.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+
 
 class VideoPlayer extends StatefulWidget {
   final String videoURL;
@@ -17,7 +19,7 @@ class _VideoPlayerState extends State<VideoPlayer> {
     return Container(
       margin: const EdgeInsets.fromLTRB(10, 20, 10, 20),
       child: EasyWebView(
-        src: sprintf(videoPlayerContent, [widget.videoURL, "34.69.223.197", "8024"]) ,
+        src: sprintf(videoPlayerContent, [widget.videoURL, env["STREAM_ACTIVE"], env["STREAM_HOST"], env["STREAM_PORT"]]),
         onLoaded: () {},
         isHtml: true,
         isMarkdown: false,
@@ -62,52 +64,60 @@ class _VideoPlayerState extends State<VideoPlayer> {
 
           <script>
             let videoPath = "%s";
+            let streamActive = "%s";
             let streamServer = "%s";
             let streamPort = "%s";
             let path = encodeURIComponent(videoPath);
 
-            var video = videojs("video");
-            video.src({
-                src: "http://"+ streamServer + ":" + streamPort + "/media/" + path,
-                type: 'video/mp4'
-            });
+            if(streamActive) {
+                var video = videojs("video");
+                video.src({
+                    src: "http://"+ streamServer + ":" + streamPort + "/media/" + path,
+                    type: 'video/mp4'
+                });
 
-            // Get the dureation of the movie
-            \$.getJSON("http://"+ streamServer + ":" + streamPort + "/duration/" + path, (data) => {
-                video.theDuration = data.duration / 1000;
-            });
+                // Get the dureation of the movie
+                \$.getJSON("http://"+ streamServer + ":" + streamPort + "/duration/" + path, (data) => {
+                    video.theDuration = data.duration / 1000;
+                });
 
-            // hack duration
-            video.duration = () => video.theDuration;
-            video.start = 0;
+                // hack duration
+                video.duration = () => video.theDuration;
+                video.start = 0;
 
-            // The original code for "currentTime"
-            video.oldCurrentTime = function currentTime(seconds) {
-              if (typeof seconds !== 'undefined') {
-                if (seconds < 0)
-                  seconds = 0;
+                // The original code for "currentTime"
+                video.oldCurrentTime = function currentTime(seconds) {
+                if (typeof seconds !== 'undefined') {
+                    if (seconds < 0)
+                    seconds = 0;
 
-                this.techCall_('setCurrentTime', seconds);
-                return;
-              }
-              this.cache_.currentTime = this.techGet_('currentTime') || 0;
-              return this.cache_.currentTime;
+                    this.techCall_('setCurrentTime', seconds);
+                    return;
+                }
+                this.cache_.currentTime = this.techGet_('currentTime') || 0;
+                return this.cache_.currentTime;
+                }
+
+                // Our modified currentTime
+                video.currentTime = (time) => {
+                if( time == undefined )
+                    return video.oldCurrentTime() + video.start;
+
+                video.start = time;
+                video.oldCurrentTime(0);
+                video.src({
+                    src: "http://" + streamServer + ":" + streamPort + "/media/" + path + "?start=" + time,
+                    type: 'video/mp4'
+                });
+                video.play();
+                return this;
+                };
+            } else {
+                var video = videojs("video");
+                video.src({
+                    src: videoPath
+                });
             }
-
-            // Our modified currentTime
-            video.currentTime = (time) => {
-              if( time == undefined )
-                return video.oldCurrentTime() + video.start;
-
-              video.start = time;
-              video.oldCurrentTime(0);
-              video.src({
-                src: "http://" + streamServer + ":" + streamPort + "/media/" + path + "?start=" + time,
-                type: 'video/mp4'
-              });
-              video.play();
-              return this;
-            };
           </script>
       </body>
   </html>

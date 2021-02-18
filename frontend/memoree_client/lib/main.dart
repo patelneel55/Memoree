@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart' as dotenv;
 
 import 'package:memoree_client/app/models/constants.dart';
 import 'package:memoree_client/app/pages/login.dart';
 import 'package:memoree_client/app/models/themes.dart';
 
-void main() => runApp(MyApp());
+Future main() async {
+  await dotenv.load();
+  runApp(MyApp());
+}
 
 class MyApp extends StatelessWidget {
   @override

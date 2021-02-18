@@ -30,7 +30,7 @@ gcloud_bucket = args.gcp_bucket_path
 # Constants
 gb_limit = float(args.gb) # Daily bandwith limit in GB
 duration_limit = float(args.duration) # Monthy video duration limit in mins
-metadata_file = "./uploaded_files.json"
+metadata_file = os.path.abspath(os.path.join(os.path.dirname(__file__), "uploaded_files.json"))
 
 with open(metadata_file) as json_file:
     try:

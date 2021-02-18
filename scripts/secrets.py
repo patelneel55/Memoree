@@ -25,7 +25,7 @@ firebase_project_id = args.project_id
 with open(secret_file) as file:
     json_secrets = json.load(file)
 
-# # Backend configuration
+# Backend configuration
 print("Configuring backend services...\n")
 
 def flattenTree(tree):
@@ -36,7 +36,7 @@ def flattenTree(tree):
             for child in children:
                 flatten_vals.append(key + "." + child)
         else:
-            flatten_vals.append (key + "=" + value)
+            flatten_vals.append(key + "=" + str(value))
     return flatten_vals
 
 backend_secrets = json_secrets["backend"]
@@ -63,6 +63,12 @@ print()
 
 target_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "frontend/memoree_client/web/secrets.js")
 with open(target_path, 'w') as f:
-    f.write("let secrets = " + json.dumps(frontend_secrets, indent=4))
+    f.write("let secrets = " + json.dumps(frontend_secrets["firebase"], indent=4))
+
+target_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "frontend/memoree_client/.env")
+streaming_secrets = frontend_secrets["streaming"]
+with open(target_path, 'w') as f:
+    for key, value in frontend_secrets["streaming"].items():
+        f.write(f"STREAM_{key.upper()}={json.dumps(value)}\n")
 
 print("Done.")

@@ -124,7 +124,7 @@ async function addSearchRecords(bucketObject) {
 
 	// Upload parsed data to search database using helper functions
 	parseFunc.forEach((func) => {
-		if(functions.config().memoree.typesense.active)
+		if(functions.config().memoree.typesense.active == "True")
 			typesense.save(
 				func(json.annotation_results),
 				functions.config().memoree.typesense.host,
@@ -132,7 +132,7 @@ async function addSearchRecords(bucketObject) {
 				functions.config().memoree.typesense.api_key,
 				functions.config().memoree.typesense.index
 			)
-		else if(functions.config().memoree.algolia.active)
+		else if(functions.config().memoree.algolia.active == "True")
 			algolia.save(
 				func(json.annotation_results),
 				functions.config().memoree.algolia.app_id,
@@ -151,7 +151,7 @@ async function addSearchRecords(bucketObject) {
 async function makeSearchRequest(queryParams)
 {
 	let tailoredResults = []
-	if(functions.config().memoree.typesense.active)
+	if(functions.config().memoree.typesense.active == "True")
 	{
 		let request_per_page = queryParams.per_page * queryParams.page;
 		queryParams.page = 1;
@@ -196,7 +196,7 @@ async function makeSearchRequest(queryParams)
 		}
 		tailoredResults = tailoredResults.slice(0, request_per_page);
 	}
-	else if(functions.config().memoree.algolia.active)
+	else if(functions.config().memoree.algolia.active == "True")
 	{
 		let searchResult = await algolia.search(
 			queryParams,
